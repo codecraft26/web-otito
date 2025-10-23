@@ -18,7 +18,6 @@ interface NewsLayoutProps {
     date: string;
     comments: number;
     category: string;
-    
     content: { heading: string; text: string }[];
   };
 }
