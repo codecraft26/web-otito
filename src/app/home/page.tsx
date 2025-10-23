@@ -177,7 +177,7 @@ export default function TopTrendingSection() {
           <Slider>
             {filteredSlides.length > 0 ? (
               filteredSlides.map((slide, index) => (
-                <Slide key={slide.id} active={index === current}>
+                <Slide key={slide.id} $active={index === current}>
                   <ImageWrapper>
                     <StyledImage
                       src={slide.image}
@@ -199,7 +199,7 @@ export default function TopTrendingSection() {
 
           <Dots>
             {filteredSlides.map((_, index) => (
-              <Dot key={index} active={index === current} />
+              <Dot key={index} $active={index === current} />
             ))}
           </Dots>
         </Section>

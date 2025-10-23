@@ -83,11 +83,11 @@ export const Slider = styled.div`
   }
 `;
 
-export const Slide = styled.div<{ active: boolean }>`
+export const Slide = styled.div<{ $active: boolean }>`
   position: absolute;
   width: 100%;
   height: 100%;
-  opacity: ${({ active }) => (active ? 1 : 0)};
+  opacity: ${({ $active }) => ($active ? 1 : 0)};
   transition: opacity 0.6s ease;
 `;
 
@@ -135,11 +135,11 @@ export const Dots = styled.div`
   gap: 8px;
 `;
 
-export const Dot = styled.div<{ active: boolean }>`
+export const Dot = styled.div<{ $active: boolean }>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: ${({ active }) => (active ? "#E35D2D" : "#D3D3D3")};
+  background-color: ${({ $active }) => ($active ? "#E35D2D" : "#D3D3D3")};
   transition: background-color 0.3s ease;
 `;
 

@@ -31,9 +31,9 @@ export const newsData = [
     date: "3rd September, 2025",
     comments: 25,
     category: "Travel",
-    likes: "23k",
-    dislikes: "3k",
-    shares: "10k",
+    likes: 23000,
+    dislikes: 3000,
+    shares: 10000,
     content: [
       {
         heading: "Morning: Wake Up by the Sea",

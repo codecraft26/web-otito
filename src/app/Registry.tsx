@@ -23,7 +23,13 @@ export default function StyledComponentsRegistry({
   }
 
   return (
-    <StyleSheetManager sheet={styledComponentsStyleSheet.instance}>
+    <StyleSheetManager 
+      sheet={styledComponentsStyleSheet.instance}
+      shouldForwardProp={(prop) => {
+        // Filter out transient props (prefixed with $)
+        return !prop.startsWith('$')
+      }}
+    >
       {children}
     </StyleSheetManager>
   )

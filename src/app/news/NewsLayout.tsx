@@ -62,7 +62,7 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({ article }) => {
             {article.images.map((_, idx) => (
               <Dot
                 key={idx}
-                active={idx === currentSlide}
+                $active={idx === currentSlide}
                 onClick={() => setCurrentSlide(idx)}
               />
             ))}
@@ -243,11 +243,11 @@ const Dots = styled.div`
   }
 `;
 
-const Dot = styled.div<{ active: boolean }>`
+const Dot = styled.div<{ $active: boolean }>`
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: ${({ active }) => (active ? "#fff" : "#cfcfcf")};
+  background: ${({ $active }) => ($active ? "#fff" : "#cfcfcf")};
   cursor: pointer;
   transition: all 0.25s ease;
 

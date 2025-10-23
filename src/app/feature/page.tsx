@@ -12,9 +12,9 @@ const Wrapper = styled.div`
   }
 `;
 
-const Section = styled.section<{ reverse?: boolean }>`
+const Section = styled.section<{ $reverse?: boolean }>`
   display: flex;
-  flex-direction: ${({ reverse }) => (reverse ? "row-reverse" : "row")};
+  flex-direction: ${({ $reverse }) => ($reverse ? "row-reverse" : "row")};
   align-items: center;
   justify-content: center;
   padding: 80px 0;
@@ -31,9 +31,9 @@ const Section = styled.section<{ reverse?: boolean }>`
   }
 `;
 
-const InnerContainer = styled.div<{ reverse?: boolean }>`
+const InnerContainer = styled.div<{ $reverse?: boolean }>`
   display: flex;
-  flex-direction: ${({ reverse }) => (reverse ? "row-reverse" : "row")};
+  flex-direction: ${({ $reverse }) => ($reverse ? "row-reverse" : "row")};
   align-items: center;
   justify-content: space-between;
   width: 1200px;
@@ -58,9 +58,9 @@ const ImageContainer = styled.div`
   align-items: center;
 `;
 
-const StyledImage = styled.img<{ customWidth?: string; customHeight?: string }>`
-  width: ${({ customWidth }) => customWidth || "577px"};
-  height: ${({ customHeight }) => customHeight || "363px"};
+const StyledImage = styled.img<{ $customWidth?: string; $customHeight?: string }>`
+  width: ${({ $customWidth }) => $customWidth || "577px"};
+  height: ${({ $customHeight }) => $customHeight || "363px"};
   border-radius: 16px;
   object-fit: cover;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -283,14 +283,14 @@ export default function FeaturePage() {
   return (
     <Wrapper>
       {sections.map((section, index) => (
-        <Section key={index} reverse={index % 2 === 1}>
-          <InnerContainer reverse={index % 2 === 1}>
+        <Section key={index} $reverse={index % 2 === 1}>
+          <InnerContainer $reverse={index % 2 === 1}>
             <ImageContainer>
               <StyledImage
                 src={section.image}
                 alt={section.title}
-                customWidth={section.customWidth}
-                customHeight={section.customHeight}
+                $customWidth={section.customWidth}
+                $customHeight={section.customHeight}
               />
             </ImageContainer>
             <Content>
