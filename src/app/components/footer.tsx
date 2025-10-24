@@ -19,7 +19,7 @@ export default function Footer() {
           <StyledLink href="/features">About</StyledLink>
           <StyledLink href="/#more-headlines">News</StyledLink>
           <StyledLink href="/terms">Terms & Conditions</StyledLink>
-          <StyledLink href="/privacy">Privacy Policy</StyledLink>
+          <StyledLink href="/privacy-policy">Privacy Policy</StyledLink>
         </FooterNav>
 
         <LogoWrapper>
