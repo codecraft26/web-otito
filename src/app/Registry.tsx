@@ -18,17 +18,20 @@ export default function StyledComponentsRegistry({
     return <>{styles}</>
   })
 
+  const shouldForward = (prop: string) => !prop.startsWith('$')
+
   if (typeof window !== 'undefined') {
-    return <>{children}</>
+    return (
+      <StyleSheetManager shouldForwardProp={shouldForward}>
+        {children}
+      </StyleSheetManager>
+    )
   }
 
   return (
-    <StyleSheetManager 
+    <StyleSheetManager
       sheet={styledComponentsStyleSheet.instance}
-      shouldForwardProp={(prop) => {
-        // Filter out transient props (prefixed with $)
-        return !prop.startsWith('$')
-      }}
+      shouldForwardProp={shouldForward}
     >
       {children}
     </StyleSheetManager>

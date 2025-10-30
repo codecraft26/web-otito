@@ -33,8 +33,9 @@ export default function Footer() {
         </LogoWrapper>
 
         <FooterText>
-          Lorem ipsum dolor sit amet, consectetur do adipiscing elit, sed do
-          emod tempor incid labore et dolore magna aliqua.
+          Otito brings you concise, trustworthy news across categories — updated
+          throughout the day. Stay informed with quick summaries and jump into
+          full stories when you want more context.
         </FooterText>
 
         <SocialIcons>
