@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import {
   Wrapper,
@@ -31,6 +31,7 @@ import {
 
 import NewsCard from "../components/NewsCard";
 import { useApiList } from "../hooks/useApi";
+import { fetchCategories } from "../services/api";
 
 type ApiArticle = {
   id?: string | number;
@@ -48,42 +49,39 @@ type ApiArticle = {
 };
 
 export default function TopTrendingSection() {
-  // ----- Trending Slides (fetched: category=top) -----
+  // ----- Trending Slides (fetched per selected category) -----
   type Slide = { id: string | number; image: string; caption: string; category: string };
-  const { data: topRaw, loading: slidesLoading, error: slidesError } = useApiList<ApiArticle>(
-    "/api/articles",
-    { "category[]": ["top"], language: "EN", page: "1", limit: "5" }
-  );
-  const slides: Slide[] = topRaw.map((a, idx) => {
-    const categoryValue = Array.isArray(a.category)
-      ? (a.category[0] ?? "Trending")
-      : a.category ?? "Trending";
-    return {
-      id: a.id ?? a._id ?? `top-${idx}`,
-      image: a.image ?? a.imageUrl ?? a.thumbnail ?? "/images/demo1.png",
-      caption: a.title ?? a.headline ?? "",
-      category: categoryValue,
-    };
-  });
 
-  // ----- Categories -----
-  const categories = [
-    { name: "India", icon: "/icons/india.png" },
-    { name: "Politics", icon: "/icons/politics.png" },
-    { name: "World", icon: "/icons/world.png" },
-    { name: "Trending", icon: "/icons/trending.png" },
-    { name: "Business", icon: "/icons/business.png" },
-    { name: "Entertainment", icon: "/icons/entertainment.png" },
-    { name: "Crime", icon: "/icons/crime.png" },
-    { name: "Tech", icon: "/icons/tech.png" },
-    { name: "Health", icon: "/icons/health.png" },
-    { name: "Education", icon: "/icons/education.png" },
-    { name: "Lifestyle", icon: "/icons/lifestyle.png" },
-    { name: "Science", icon: "/icons/science.png" },
-    { name: "Weather", icon: "/icons/weather.png" },
-    { name: "Tourism", icon: "/icons/tourism.png" },
-    { name: "Food", icon: "/icons/food.png" },
-  ];
+  // ----- Categories (fetched enum) -----
+  const [categories, setCategories] = useState<Array<{ slug: string; name: string; icon: string }>>([]);
+  useEffect(() => {
+    const load = async () => {
+      const slugs = await fetchCategories();
+      const iconMap: Record<string, string> = {
+        business: "/icons/business.png",
+        crime: "/icons/crime.png",
+        domestic: "/icons/india.png",
+        education: "/icons/education.png",
+        entertainment: "/icons/entertainment.png",
+        environment: "/icons/science.png",
+        food: "/icons/food.png",
+        health: "/icons/health.png",
+        lifestyle: "/icons/lifestyle.png",
+        other: "/icons/trending.png",
+        politics: "/icons/politics.png",
+        science: "/icons/science.png",
+        sports: "/icons/world.png",
+        technology: "/icons/tech.png",
+        top: "/icons/trending.png",
+        tourism: "/icons/tourism.png",
+        world: "/icons/world.png",
+      };
+      const toName = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+      const mapped = slugs.map((slug) => ({ slug, name: toName(slug), icon: iconMap[slug] || "/icons/world.png" }));
+      setCategories(mapped);
+    };
+    load();
+  }, []);
 
   // ----- Headlines (fetched from API) -----
   const [headlines, setHeadlines] = useState<Array<{
@@ -109,9 +107,56 @@ export default function TopTrendingSection() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [errorMore, setErrorMore] = useState<string | null>(null);
 
+  // ----- States -----
+  const [current, setCurrent] = useState(0);
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [showAllHeadlines, setShowAllHeadlines] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const apiCategory = useMemo(() => {
+    const name = selectedCategory;
+    if (!name || name === "All") return undefined;
+    // selectedCategory holds slug from categories list (or "All")
+    return name;
+  }, [selectedCategory]);
+
+  const top10Params = useMemo<Record<string, string | string[]>>(() => {
+    if (apiCategory) {
+      return { "category[]": [apiCategory], page: "1", limit: "10", language: "EN" };
+    }
+    return { page: "1", limit: "10", language: "EN" } as Record<string, string>;
+  }, [apiCategory]);
+
+  // Slides depend on selected category
+  const slidesParams = useMemo<Record<string, string | string[]>>(() => {
+    if (apiCategory) {
+      return { "category[]": [apiCategory], language: "EN", page: "1", limit: "5" };
+    }
+    return { "category[]": ["top"], language: "EN", page: "1", limit: "5" };
+  }, [apiCategory]);
+
+  const { data: topRaw, loading: slidesLoading, error: slidesError } = useApiList<ApiArticle>(
+    "/api/articles",
+    slidesParams
+  );
+
+  const slides: Slide[] = useMemo(() => {
+    return topRaw.map((a, idx) => {
+      const categoryValue = Array.isArray(a.category)
+        ? (a.category[0] ?? "Trending")
+        : a.category ?? "Trending";
+      return {
+        id: a.id ?? a._id ?? `top-${idx}`,
+        image: a.image ?? a.imageUrl ?? a.thumbnail ?? "/images/demo1.png",
+        caption: a.title ?? a.headline ?? "",
+        category: categoryValue,
+      };
+    });
+  }, [topRaw]);
+
   const { data: top10Raw, loading: top10Loading, error: top10Error } = useApiList<ApiArticle>(
     "/api/articles",
-    { page: "1", limit: "10", language: "EN" }
+    top10Params
   );
   useEffect(() => {
     setIsLoading(top10Loading);
@@ -127,9 +172,16 @@ export default function TopTrendingSection() {
     setHeadlines(mapped);
   }, [top10Raw, top10Loading, top10Error]);
 
+  const moreParams = useMemo<Record<string, string | string[]>>(() => {
+    if (apiCategory) {
+      return { "category[]": [apiCategory], language: "EN", page: "1", limit: "10" };
+    }
+    return { "category[]": ["crime", "technology"], language: "EN", page: "1", limit: "10" };
+  }, [apiCategory]);
+
   const { data: moreRaw, loading: moreLoading, error: moreErr } = useApiList<ApiArticle>(
     "/api/articles",
-    { "category[]": ["crime", "technology"], language: "EN", page: "1", limit: "10" }
+    moreParams
   );
   useEffect(() => {
     setIsLoadingMore(moreLoading);
@@ -145,15 +197,16 @@ export default function TopTrendingSection() {
     setMoreApiHeadlines(mapped);
   }, [moreRaw, moreLoading, moreErr]);
 
-  // ----- States -----
-  const [current, setCurrent] = useState(0);
-  const [showAllCategories, setShowAllCategories] = useState(false);
-  const [showAllHeadlines, setShowAllHeadlines] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
   // Filter logic
-  const filteredSlides =
-    selectedCategory === "All" ? slides : slides.filter((s) => s.category === selectedCategory);
+  const filteredSlides = useMemo(() => {
+    if (selectedCategory === "All") return slides;
+    if (apiCategory) {
+      return slides.filter((s) => (s.category || "").toLowerCase() === apiCategory);
+    }
+    return slides.filter(
+      (s) => (s.category || "").toLowerCase() === (selectedCategory || "").toLowerCase()
+    );
+  }, [slides, selectedCategory, apiCategory]);
 
   // Auto-slide trending section
   useEffect(() => {
@@ -163,15 +216,26 @@ export default function TopTrendingSection() {
     return () => clearInterval(timer);
   }, [filteredSlides.length]);
 
-  const filteredHeadlines =
-    selectedCategory === "All"
-      ? headlines
-      : headlines.filter((h) => h.category === selectedCategory);
+  const filteredHeadlines = useMemo(() => {
+    if (selectedCategory === "All") return headlines;
+    if (apiCategory) {
+      return headlines.filter((h) => (h.category || "").toLowerCase() === apiCategory);
+    }
+    return headlines.filter(
+      (h) => (h.category || "").toLowerCase() === (selectedCategory || "").toLowerCase()
+    );
+  }, [headlines, selectedCategory, apiCategory]);
 
   const topHeadlines = filteredHeadlines.slice(0, 10);
-  const filteredMore = selectedCategory === "All"
-    ? moreApiHeadlines
-    : moreApiHeadlines.filter((h) => h.category === selectedCategory);
+  const filteredMore = useMemo(() => {
+    if (selectedCategory === "All") return moreApiHeadlines;
+    if (apiCategory) {
+      return moreApiHeadlines.filter((h) => (h.category || "").toLowerCase() === apiCategory);
+    }
+    return moreApiHeadlines.filter(
+      (h) => (h.category || "").toLowerCase() === (selectedCategory || "").toLowerCase()
+    );
+  }, [moreApiHeadlines, selectedCategory, apiCategory]);
   const moreHeadlines = showAllHeadlines ? filteredMore : filteredMore.slice(0, 6);
 
   return (
@@ -223,11 +287,11 @@ export default function TopTrendingSection() {
               <CategoriesScroll>
                 {categories.map((cat) => (
                   <CategoryButton
-                    key={cat.name}
-                    onClick={() => setSelectedCategory(cat.name)}
+                    key={cat.slug}
+                    onClick={() => setSelectedCategory(cat.slug)}
                     style={{
                       border:
-                        selectedCategory === cat.name
+                        selectedCategory === cat.slug
                           ? "2px solid #c75b27"
                           : "2px solid transparent",
                     }}
@@ -243,11 +307,11 @@ export default function TopTrendingSection() {
               <CategoriesGrid>
                 {categories.map((cat) => (
                   <CategoryButton
-                    key={cat.name}
-                    onClick={() => setSelectedCategory(cat.name)}
+                    key={cat.slug}
+                    onClick={() => setSelectedCategory(cat.slug)}
                     style={{
                       border:
-                        selectedCategory === cat.name
+                        selectedCategory === cat.slug
                           ? "2px solid #c75b27"
                           : "2px solid transparent",
                     }}
