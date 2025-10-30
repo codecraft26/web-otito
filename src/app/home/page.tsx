@@ -30,32 +30,41 @@ import {
 } from "../Styles/HomeStyled";
 
 import NewsCard from "../components/NewsCard";
+import { useApiList } from "../hooks/useApi";
+
+type ApiArticle = {
+  id?: string | number;
+  _id?: string;
+  title?: string;
+  headline?: string;
+  summary?: string;
+  description?: string;
+  image?: string;
+  imageUrl?: string;
+  thumbnail?: string;
+  category?: string | string[];
+  language?: string;
+  content?: string;
+};
 
 export default function TopTrendingSection() {
-  // ----- Trending Slides -----
-  const slides = [
-    {
-      id: 1,
-      image: "/images/trending1.jpg",
-      caption:
-        "This week’s top OTT hit is Manoj Bajpayee’s movie Inspector Jhende, based on a true incident.",
-      category: "Entertainment",
-    },
-    {
-      id: 2,
-      image: "/images/trending2.jpg",
-      caption:
-        "Vikrant Massey’s next crime thriller dominates streaming charts this week.",
-      category: "Crime",
-    },
-    {
-      id: 3,
-      image: "/images/trending3.jpg",
-      caption:
-        "New documentary on India’s police reforms gains attention across OTT platforms.",
-      category: "Politics",
-    },
-  ];
+  // ----- Trending Slides (fetched: category=top) -----
+  type Slide = { id: string | number; image: string; caption: string; category: string };
+  const { data: topRaw, loading: slidesLoading, error: slidesError } = useApiList<ApiArticle>(
+    "/api/articles",
+    { "category[]": ["top"], language: "EN", page: "1", limit: "5" }
+  );
+  const slides: Slide[] = topRaw.map((a, idx) => {
+    const categoryValue = Array.isArray(a.category)
+      ? (a.category[0] ?? "Trending")
+      : a.category ?? "Trending";
+    return {
+      id: a.id ?? a._id ?? `top-${idx}`,
+      image: a.image ?? a.imageUrl ?? a.thumbnail ?? "/images/demo1.png",
+      caption: a.title ?? a.headline ?? "",
+      category: categoryValue,
+    };
+  });
 
   // ----- Categories -----
   const categories = [
@@ -76,68 +85,65 @@ export default function TopTrendingSection() {
     { name: "Food", icon: "/icons/food.png" },
   ];
 
-  // ----- Headlines -----
-  const headlines = [
-    {
-      id: 1,
-      title: "Mahindra Cars Now Gets Up to ₹1.56 Lakh Discount",
-      summary:
-        "Following the government’s decision to change the GST slab structure, Mahindra cut prices of petrol and diesel SUVs by up to ₹1.56 lakh from today.",
-      expandedText: "This makes popular models like Bolero, Thar, Scorpio, and XUV700 much cheaper now. From now on, petrol cars below 1200cc, diesel cars below 1500cc, and cars shorter than 4 meters attract just 18% GST, not 28%. Therefore, Mahindra has cut prices on Bolero, Bolero Neo, Thar, Scorpio, XUV3XO (petrol and diesel), XUV700, and Scorpio-N. Price cuts range between ₹1.01 lakh and ",
-      image: "/images/mahindra.png",
-      category: "Business",
-    },
-    {
-      id: 2,
-      title: "Modi Called ‘Friend’ by Trump Again",
-      summary:
-        "US President Donald Trump recently indicated reducing the distance in India–US relations.",
-      expandedText: "In a recent interview, Trump referred to Prime Minister Narendra Modi as his 'friend' and expressed his admiration for Modi's leadership. This marks another instance where Trump has highlighted the strong ties between the two nations, emphasizing cooperation on various fronts including trade, defense, and counter.",
-      image: "/images/modi.png",
-      category: "Politics",
-    },
-    {
-      id: 3,
-      title: "Maruti Suzuki Announces Festival Offers",
-      summary:
-        "Maruti Suzuki introduces massive festive discounts on popular hatchbacks and SUVs this Diwali season.",
-      expandedText: "The offers include cash discounts, exchange bonuses, and attractive financing options on models like Swift, Baleno, Vitara Brezza, and Ertiga. Customers can avail discounts up to ₹75,000 on select models. Additionally, Maruti Suzuki is providing special benefits for first-time buyers and loyal customers during the festive period.",
-      image: "/images/maruti.png",
-      category: "Business",
-    },
-    {
-      id: 4,
-      title: "India’s Stock Market Hits Record High",
-      summary: "The Sensex and Nifty reached new lifetime highs.",
-      expandedText: "The stock market rally was driven by strong corporate earnings and positive global cues. Investors are optimistic about the economic recovery and are betting on further reforms by the government.",
-      image: "/images/market.png",
-      category: "Business",
-    },
-    {
-      id: 5,
-      title: "New EV Policy Announced by Government",
-      summary: "The central government launches incentives for EV adoption.",
-      expandedText: "The new policy aims to boost electric vehicle sales by offering subsidies, tax benefits, and developing charging infrastructure across the country. The government targets to have 30% of all vehicles on the road to be electric by 2030.",
-      image: "/images/ev.png",
-      category: "Tech",
-    },
-    {
-      id: 6,
-      title: "Tech Giants Announce New AI Initiatives",
-      summary: "Several leading tech companies revealed ambitious AI programs.",
-      expandedText: "These initiatives focus on advancing AI research, developing ethical guidelines, and creating AI-powered products to enhance user experience. Collaboration between companies and academic institutions is also a key component of these programs.",
-      image: "/images/ai.png",
-      category: "Tech",
-    },
-    {
-      id: 7,
-      title: "Crude Oil Prices Drop Amid Global Uncertainty",
-      summary: "Global oil prices fell 2% due to declining demand.",
-      expandedText: "The drop in crude oil prices is attributed to concerns over economic slowdown and oversupply in the market. Analysts predict that prices may remain volatile in the coming months as geopolitical tensions and production decisions by major oil-producing countries continue to impact the market.",
-      image: "/images/oil.png",
-      category: "World",
-    },
-  ];
+  // ----- Headlines (fetched from API) -----
+  const [headlines, setHeadlines] = useState<Array<{
+    id: string | number;
+    title: string;
+    summary?: string;
+    expandedText?: string;
+    image?: string;
+    category?: string;
+  }>>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // More headlines (separate API with categories filter)
+  const [moreApiHeadlines, setMoreApiHeadlines] = useState<Array<{
+    id: string | number;
+    title: string;
+    summary?: string;
+    expandedText?: string;
+    image?: string;
+    category?: string;
+  }>>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [errorMore, setErrorMore] = useState<string | null>(null);
+
+  const { data: top10Raw, loading: top10Loading, error: top10Error } = useApiList<ApiArticle>(
+    "/api/articles",
+    { page: "1", limit: "10", language: "EN" }
+  );
+  useEffect(() => {
+    setIsLoading(top10Loading);
+    setError(top10Error ?? null);
+    const mapped = top10Raw.map((a, idx) => ({
+      id: a.id ?? a._id ?? `${idx}`,
+      title: a.title ?? a.headline ?? "Untitled",
+      summary: a.summary ?? a.description ?? undefined,
+      expandedText: a.content ?? a.description ?? undefined,
+      image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
+      category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
+    }));
+    setHeadlines(mapped);
+  }, [top10Raw, top10Loading, top10Error]);
+
+  const { data: moreRaw, loading: moreLoading, error: moreErr } = useApiList<ApiArticle>(
+    "/api/articles",
+    { "category[]": ["crime", "technology"], language: "EN", page: "1", limit: "10" }
+  );
+  useEffect(() => {
+    setIsLoadingMore(moreLoading);
+    setErrorMore(moreErr ?? null);
+    const mapped = moreRaw.map((a, idx) => ({
+      id: a.id ?? a._id ?? `more-${idx}`,
+      title: a.title ?? a.headline ?? "Untitled",
+      summary: a.summary ?? a.description ?? undefined,
+      expandedText: a.content ?? a.description ?? undefined,
+      image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
+      category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
+    }));
+    setMoreApiHeadlines(mapped);
+  }, [moreRaw, moreLoading, moreErr]);
 
   // ----- States -----
   const [current, setCurrent] = useState(0);
@@ -145,28 +151,28 @@ export default function TopTrendingSection() {
   const [showAllHeadlines, setShowAllHeadlines] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  // Filter logic
+  const filteredSlides =
+    selectedCategory === "All" ? slides : slides.filter((s) => s.category === selectedCategory);
+
   // Auto-slide trending section
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % filteredSlides.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [slides.length]);
-
-  // Filter logic
-  const filteredSlides =
-    selectedCategory === "All"
-      ? slides
-      : slides.filter((s) => s.category === selectedCategory);
+  }, [filteredSlides.length]);
 
   const filteredHeadlines =
     selectedCategory === "All"
       ? headlines
       : headlines.filter((h) => h.category === selectedCategory);
 
-  const visibleHeadlines = showAllHeadlines
-    ? filteredHeadlines
-    : filteredHeadlines.slice(0, 6);
+  const topHeadlines = filteredHeadlines.slice(0, 10);
+  const filteredMore = selectedCategory === "All"
+    ? moreApiHeadlines
+    : moreApiHeadlines.filter((h) => h.category === selectedCategory);
+  const moreHeadlines = showAllHeadlines ? filteredMore : filteredMore.slice(0, 6);
 
   return (
     <Wrapper>
@@ -175,16 +181,15 @@ export default function TopTrendingSection() {
         <Section id="top-trendings">
           <Title>TOP TRENDINGS</Title>
           <Slider>
-            {filteredSlides.length > 0 ? (
+            {slidesLoading ? (
+              <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+            ) : slidesError ? (
+              <p style={{ textAlign: "center", color: "#c00" }}>{slidesError}</p>
+            ) : filteredSlides.length > 0 ? (
               filteredSlides.map((slide, index) => (
                 <Slide key={slide.id} $active={index === current}>
                   <ImageWrapper>
-                    <StyledImage
-                      src={slide.image}
-                      alt={slide.caption}
-                      fill
-                      priority
-                    />
+                    <StyledImage src={slide.image} alt={slide.caption} fill priority />
                     <Overlay />
                     <Caption>{slide.caption}</Caption>
                   </ImageWrapper>
@@ -265,8 +270,12 @@ export default function TopTrendingSection() {
               TOP <span>10</span> HEADLINES
             </Title>
             <HeadlinesGrid>
-              {filteredHeadlines.slice(0, 10).length > 0 ? (
-                filteredHeadlines.slice(0, 10).map((news, index) => (
+              {isLoading ? (
+                <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+              ) : error ? (
+                <p style={{ textAlign: "center", color: "#c00" }}>{error}</p>
+              ) : topHeadlines.length > 0 ? (
+                topHeadlines.map((news, index) => (
                   <NewsCard
                     key={news.id}
                     news={news}
@@ -289,8 +298,12 @@ export default function TopTrendingSection() {
             <Title>MORE HEADLINES</Title>
 
             <HeadlinesGrid>
-              {visibleHeadlines.length > 0 ? (
-                visibleHeadlines.map((news, index) => (
+              {isLoadingMore ? (
+                <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+              ) : errorMore ? (
+                <p style={{ textAlign: "center", color: "#c00" }}>{errorMore}</p>
+              ) : moreHeadlines.length > 0 ? (
+                moreHeadlines.map((news, index) => (
                   <NewsCard key={news.id} news={news} rank={index + 1} />
                 ))
               ) : (
@@ -300,7 +313,7 @@ export default function TopTrendingSection() {
               )}
             </HeadlinesGrid>
 
-            {!showAllHeadlines && filteredHeadlines.length > 6 && (
+            {!showAllHeadlines && filteredMore.length > 6 && (
               <ButtonWrapper>
                 <ViewMoreButton onClick={() => setShowAllHeadlines(true)}>
                   View More
