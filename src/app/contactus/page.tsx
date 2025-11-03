@@ -8,6 +8,12 @@ export default function ContactUsPage() {
       <p style={{ fontWeight: 600, marginBottom: 32, color: "#000" }}>
         Email: <a href="mailto:otitoofficialnews@gmail.com" style={{ color: "#000", textDecoration: "none" }}>otitoofficialnews@gmail.com</a>
       </p>
+      <p style={{ marginBottom: 16, color: "#000" }}>
+        Instagram: <a href="https://www.instagram.com/otitonewsofficial" target="_blank" rel="noopener noreferrer" style={{ color: "#000", textDecoration: "none" }}>@otitonewsofficial</a>
+      </p>
+      <p style={{ marginBottom: 32, color: "#000" }}>
+        Phone: +91 70070 73974
+      </p>
       <p style={{ color: "#000", fontSize: "0.95rem" }}>
         We usually respond within 1–2 business days.
       </p>
