@@ -20,6 +20,7 @@ export default function Footer() {
           <StyledLink href="/#more-headlines">News</StyledLink>
           <StyledLink href="/terms">Terms & Conditions</StyledLink>
           <StyledLink href="/privacy">Privacy Policy</StyledLink>
+          <StyledLink href="/contactus">Contact Us</StyledLink>
         </FooterNav>
 
         <LogoWrapper>
@@ -39,17 +40,24 @@ export default function Footer() {
         </FooterText>
 
         <SocialIcons>
-          <IconWrapper as="a" href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-            <FaInstagram size={18} color="white" />
+          <IconWrapper
+            as="a"
+            href="https://www.instagram.com/otitonewsofficial"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Follow us on Instagram"
+            title="@otitonewsofficial on Instagram"
+          >
+            <FaInstagram size={22} color="white" />
           </IconWrapper>
           <IconWrapper as="a" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
-            <FaLinkedinIn size={18} color="white" />
+            <FaLinkedinIn size={20} color="white" />
           </IconWrapper>
           <IconWrapper as="a" href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
-            <FaTwitter size={18} color="white" />
+            <FaTwitter size={20} color="white" />
           </IconWrapper>
           <IconWrapper as="a" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
-            <FaFacebookF size={18} color="white" />
+            <FaFacebookF size={20} color="white" />
           </IconWrapper>
         </SocialIcons>
       </FooterTop>
@@ -201,10 +209,11 @@ const IconWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-2px) scale(1.05);
   }
 
   @media (max-width: 768px) {
