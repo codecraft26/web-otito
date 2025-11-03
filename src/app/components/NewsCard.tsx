@@ -9,6 +9,7 @@ type News = {
   summary?: string;
   image?: string;
   expandedText?: string;
+  source?: string;
 };
 
 type Props = {
@@ -50,6 +51,7 @@ export default function NewsCard({ news, rank = 0, showRank = false }: Props) {
         <CardText>
           <Title>{news.title}</Title>
           <Description>{news.summary}</Description>
+          {news.source && <SourceText>Source: {news.source}</SourceText>}
           {news.id && (
             <FullSummaryBtn onClick={handleSummaryClick}>
               Full Summary
@@ -160,6 +162,12 @@ const Description = styled.p`
   color: #444;
   line-height: 1.4;
   transition: all 0.3s ease;
+`;
+
+const SourceText = styled.div`
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
 `;
 
 const ExpandedText = styled.div`

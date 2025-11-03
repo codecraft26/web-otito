@@ -46,7 +46,25 @@ type ApiArticle = {
   category?: string | string[];
   language?: string;
   content?: string;
+  source?: string;
 };
+type LooseArticle = ApiArticle & { [key: string]: unknown };
+
+function deriveSource(a: LooseArticle): string | undefined {
+  const publisher = (a.source ?? a["publisher"] ?? a["sourceName"] ?? a["site"]) as
+    | string
+    | undefined;
+  if (publisher && typeof publisher === "string") return publisher;
+  const link = (a["link"] ?? a["url"]) as unknown;
+  if (typeof link === "string") {
+    try {
+      return new URL(link).hostname.replace(/^www\./, "");
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
+}
 
 type News = {
   id: string | number;
@@ -181,6 +199,7 @@ export default function TopTrendingSection() {
       expandedText: a.content ?? a.description ?? undefined,
       image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
       category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
+      source: deriveSource(a as LooseArticle),
     }));
     setHeadlines(mapped);
   }, [top10Raw, top10Loading, top10Error]);
@@ -206,6 +225,7 @@ export default function TopTrendingSection() {
       expandedText: a.content ?? a.description ?? undefined,
       image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
       category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
+      source: deriveSource(a as LooseArticle),
     }));
     setMoreApiHeadlines(mapped);
   }, [moreRaw, moreLoading, moreErr]);
@@ -220,13 +240,14 @@ export default function TopTrendingSection() {
         .then((data) => {
           if (!active) return;
           setCategoryNews((data || []).map((item, idx) => {
-            const a = item as ApiArticle;
+            const a = item as LooseArticle;
             return {
               id: a.id ?? a._id ?? `${idx}`,
               title: a.title ?? a.headline ?? "Untitled",
               summary: a.summary ?? a.description ?? undefined,
               expandedText: a.content ?? a.description ?? undefined,
               image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
+              source: deriveSource(a),
             };
           }));
         })
