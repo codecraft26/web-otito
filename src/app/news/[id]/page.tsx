@@ -20,6 +20,24 @@ async function fetchArticleById(id: string) {
       ? new Date(data.pubDate).toISOString().slice(0, 10) // YYYY-MM-DD
       : "";
 
+    const deriveSource = (): string | undefined => {
+      const obj = data as Record<string, unknown>;
+      const candidates = [obj["source"], obj["publisher"], obj["sourceName"], obj["site"]];
+      for (const c of candidates) {
+        if (typeof c === "string" && c.trim()) return c;
+      }
+      const link = obj["link"] ?? obj["url"];
+      if (typeof link === "string") {
+        try {
+          return new URL(link).hostname.replace(/^www\./, "");
+        } catch {
+          return undefined;
+        }
+      }
+      return undefined;
+    };
+    const source = deriveSource();
+
     const contentArray: { heading: string; text: string }[] = [];
 
     if (data.description) {
@@ -49,6 +67,7 @@ async function fetchArticleById(id: string) {
       date,
       comments: 0,
       category,
+      source,
       content: contentArray,
     } as const;
   } catch {

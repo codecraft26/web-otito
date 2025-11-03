@@ -18,6 +18,7 @@ interface NewsLayoutProps {
     date: string;
     comments: number;
     category: string;
+    source?: string;
     content: { heading: string; text: string }[];
   };
 }
@@ -91,6 +92,7 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({ article }) => {
         <Meta>{article.date}</Meta>
         <Meta>{article.comments} Comments</Meta>
         <Meta>Category: {article.category}</Meta>
+        {article.source && <Meta>Source: {article.source}</Meta>}
       </MetaRow>
 
       {/* Article Content */}
