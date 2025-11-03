@@ -31,7 +31,7 @@ import {
 
 import NewsCard from "../components/NewsCard";
 import { useApiList } from "../hooks/useApi";
-import { fetchCategories } from "../services/api";
+import { fetchCategories, fetchArticles } from "../services/api";
 
 type ApiArticle = {
   id?: string | number;
@@ -46,6 +46,14 @@ type ApiArticle = {
   category?: string | string[];
   language?: string;
   content?: string;
+};
+
+type News = {
+  id: string | number;
+  title: string;
+  summary?: string;
+  image?: string;
+  expandedText?: string;
 };
 
 export default function TopTrendingSection() {
@@ -106,6 +114,11 @@ export default function TopTrendingSection() {
   }>>([]);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [errorMore, setErrorMore] = useState<string | null>(null);
+
+  // NEW: State for all-news-by-category
+  const [categoryNews, setCategoryNews] = useState<News[]>([]);
+  const [isCategoryLoading, setIsCategoryLoading] = useState(false);
+  const [categoryError, setCategoryError] = useState<string|null>(null);
 
   // ----- States -----
   const [current, setCurrent] = useState(0);
@@ -197,6 +210,44 @@ export default function TopTrendingSection() {
     setMoreApiHeadlines(mapped);
   }, [moreRaw, moreLoading, moreErr]);
 
+  // When a category (not All) is selected, fetch all news for it
+  useEffect(() => {
+    let active = true;
+    if (selectedCategory !== "All") {
+      setIsCategoryLoading(true);
+      setCategoryError(null);
+      fetchArticles({ "category[]": [selectedCategory], page: "1", limit: "100", language: "EN" })
+        .then((data) => {
+          if (!active) return;
+          setCategoryNews((data || []).map((item, idx) => {
+            const a = item as ApiArticle;
+            return {
+              id: a.id ?? a._id ?? `${idx}`,
+              title: a.title ?? a.headline ?? "Untitled",
+              summary: a.summary ?? a.description ?? undefined,
+              expandedText: a.content ?? a.description ?? undefined,
+              image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
+            };
+          }));
+        })
+        .catch((e) => {
+          if (!active) return;
+          setCategoryError(e?.message ?? "Failed to fetch news");
+        })
+        .finally(() => {
+          if (!active) return;
+          setIsCategoryLoading(false);
+        });
+    } else {
+      setCategoryNews([]);
+      setCategoryError(null);
+      setIsCategoryLoading(false);
+    }
+    return () => {
+      active = false;
+    };
+  }, [selectedCategory]);
+
   // Filter logic
   const filteredSlides = useMemo(() => {
     if (selectedCategory === "All") return slides;
@@ -237,6 +288,36 @@ export default function TopTrendingSection() {
     );
   }, [moreApiHeadlines, selectedCategory, apiCategory]);
   const moreHeadlines = showAllHeadlines ? filteredMore : filteredMore.slice(0, 6);
+
+  if (selectedCategory !== "All" && categoryNews.length > 0) {
+    return (
+      <Wrapper>
+        <Container>
+          <Section>
+            <Title>
+              News in category: {categories.find(c => c.slug === selectedCategory)?.name ?? selectedCategory}
+            </Title>
+            <ButtonWrapper>
+              <ViewMoreButton onClick={() => setSelectedCategory("All")}>Back to All News</ViewMoreButton>
+            </ButtonWrapper>
+          </Section>
+          <Section>
+            {isCategoryLoading ? (
+              <p style={{textAlign: 'center', color: '#999'}}>Loading...</p>
+            ) : categoryError ? (
+              <p style={{textAlign: 'center', color: '#c00'}}>{categoryError}</p>
+            ) : (
+              <HeadlinesGrid>
+                {categoryNews.map((news, index) => (
+                  <NewsCard key={news.id} news={news} rank={index + 1} />
+                ))}
+              </HeadlinesGrid>
+            )}
+          </Section>
+        </Container>
+      </Wrapper>
+    );
+  }
 
   return (
     <Wrapper>

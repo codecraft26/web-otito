@@ -17,7 +17,7 @@ async function fetchArticleById(id: string) {
       ? data.category.join(", ")
       : data.category || "General";
     const date = data.pubDate
-      ? new Date(data.pubDate).toLocaleString()
+      ? new Date(data.pubDate).toISOString().slice(0, 10) // YYYY-MM-DD
       : "";
 
     const contentArray: { heading: string; text: string }[] = [];
@@ -56,8 +56,9 @@ async function fetchArticleById(id: string) {
   }
 }
 
-export default async function NewsPage({ params }: { params: { id: string } }) {
-  const article = await fetchArticleById(params.id);
+export default async function NewsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const article = await fetchArticleById(id);
 
   if (!article) {
     return (
