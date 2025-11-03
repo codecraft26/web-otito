@@ -30,6 +30,11 @@ export default function NewsCard({ news, rank = 0, showRank = false }: Props) {
     }
   };
 
+  const handleSummaryClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    window.open(`/news/${news.id}`, "_blank");
+  };
+
   return (
     <CardContainer onClick={handleClick}>
       <CardHeader>
@@ -41,12 +46,15 @@ export default function NewsCard({ news, rank = 0, showRank = false }: Props) {
             <RankBadge>No.{rank}</RankBadge>
           </RankBadgeWrapper>
         )}
-
-
         </ImageWrapper>
         <CardText>
           <Title>{news.title}</Title>
           <Description>{news.summary}</Description>
+          {news.id && (
+            <FullSummaryBtn onClick={handleSummaryClick}>
+              Full Summary
+            </FullSummaryBtn>
+          )}
         </CardText>
       </CardHeader>
 
@@ -159,4 +167,22 @@ const ExpandedText = styled.div`
   margin-top: 10px;
   color: #444;
   line-height: 1.4;
+`;
+
+const FullSummaryBtn = styled.button`
+  display: block;
+  background: none;
+  border: none;
+  color: #E75113;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 20px 0 6px 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  &:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+  }
 `;
