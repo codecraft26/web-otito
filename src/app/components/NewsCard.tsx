@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import styled from "styled-components";
 
 // ---- Types ----
@@ -16,24 +17,27 @@ type Props = {
   news: News;
   rank?: number;
   showRank?: boolean;
+  isExpanded?: boolean;
+  onToggle?: (id: string | number) => void;
 };
 
 // ---- Component ----
-export default function NewsCard({ news, rank = 0, showRank = false }: Props) {
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+export default function NewsCard({ news, rank = 0, showRank = false, isExpanded, onToggle }: Props) {
+  const router = useRouter();
+  const [internalExpanded, setInternalExpanded] = useState<boolean>(false);
+  const expanded = typeof isExpanded === 'boolean' ? isExpanded : internalExpanded;
 
   const handleClick = () => {
-    if (!isExpanded) {
-      setIsExpanded(true);
+    if (onToggle) {
+      onToggle(news.id);
     } else {
-      window.open(`/news/${news.id}`, "_blank");
-      setIsExpanded(false);
+      setInternalExpanded((prev) => !prev);
     }
   };
 
   const handleSummaryClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    window.open(`/news/${news.id}`, "_blank");
+    router.push(`/news/${news.id}`);
   };
 
   return (
@@ -60,7 +64,12 @@ export default function NewsCard({ news, rank = 0, showRank = false }: Props) {
         </CardText>
       </CardHeader>
 
-      {isExpanded && <ExpandedText>{news.expandedText}</ExpandedText>}
+      {expanded && news.expandedText && (
+        <ExpandedOverlay>
+          <OverlayTitle>Summary</OverlayTitle>
+          <OverlayBody>{news.expandedText}</OverlayBody>
+        </ExpandedOverlay>
+      )}
     </CardContainer>
   );
 }
@@ -77,6 +86,8 @@ const CardContainer = styled.div`
   max-width: 650px;
   margin: 8px auto;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 
   &:hover {
     box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.15);
@@ -170,11 +181,24 @@ const SourceText = styled.div`
   color: #666;
 `;
 
-const ExpandedText = styled.div`
+const ExpandedOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  padding: 16px;
+  overflow: auto;
+`;
+
+const OverlayTitle = styled.div`
+  font-weight: 700;
+  color: #E75113;
+  margin-bottom: 8px;
+`;
+
+const OverlayBody = styled.div`
   font-size: 13px;
-  margin-top: 10px;
   color: #444;
-  line-height: 1.4;
+  line-height: 1.5;
 `;
 
 const FullSummaryBtn = styled.button`
