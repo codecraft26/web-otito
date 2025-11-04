@@ -132,6 +132,7 @@ export default function TopTrendingSection() {
   }>>([]);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [errorMore, setErrorMore] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | number | null>(null);
 
   // NEW: State for all-news-by-category
   const [categoryNews, setCategoryNews] = useState<News[]>([]);
@@ -447,6 +448,8 @@ export default function TopTrendingSection() {
                     news={news}
                     rank={index + 1}
                     showRank={true}
+                    isExpanded={expandedId === news.id}
+                    onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
                   />
                 ))
               ) : (
@@ -470,7 +473,13 @@ export default function TopTrendingSection() {
                 <p style={{ textAlign: "center", color: "#c00" }}>{errorMore}</p>
               ) : moreHeadlines.length > 0 ? (
                 moreHeadlines.map((news, index) => (
-                  <NewsCard key={news.id} news={news} rank={index + 1} />
+                  <NewsCard
+                    key={news.id}
+                    news={news}
+                    rank={index + 1}
+                    isExpanded={expandedId === news.id}
+                    onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
+                  />
                 ))
               ) : (
                 <p style={{ textAlign: "center", color: "#999" }}>
