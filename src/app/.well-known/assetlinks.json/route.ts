@@ -1,0 +1,23 @@
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+    const assetLinks = [
+        {
+            relation: ['delegate_permission/common.handle_all_urls'],
+            target: {
+                namespace: 'android_app',
+                package_name: 'com.otito',
+                sha256_cert_fingerprints: [
+                    'D4:26:00:24:91:3E:07:77:BF:17:4B:61:A9:D3:85:AC:49:29:F4:09:81:93:86:BB:F6:CA:8F:29:88:BA:9D:56',
+                ],
+            },
+        },
+    ];
+
+    return NextResponse.json(assetLinks, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=3600',
+        },
+    });
+}
