@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import * as React from "react";
 import NewsLayout from "../NewsLayout";
 
 async function fetchArticleById(id: string) {
@@ -75,9 +79,44 @@ async function fetchArticleById(id: string) {
   }
 }
 
-export default async function NewsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const article = await fetchArticleById(id);
+export default function NewsPage({ params }: { params: Promise<{ id: string }> }) {
+  const [article, setArticle] = React.useState<Awaited<ReturnType<typeof fetchArticleById>> | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    // Redirect logic for mobile devices
+    const ua = navigator.userAgent || navigator.vendor;
+
+    if (/android/i.test(ua)) {
+      window.location.replace(
+        "https://play.google.com/store/apps/details?id=com.otito"
+      );
+      return;
+    } else if (/iPad|iPhone|iPod/.test(ua)) {
+      window.location.replace(
+        "https://apps.apple.com/in/app/otito/id6754835189"
+      );
+      return;
+    }
+    // Desktop users continue to view the page
+  }, []);
+
+  useEffect(() => {
+    params.then(({ id }) => {
+      fetchArticleById(id).then((data) => {
+        setArticle(data);
+        setLoading(false);
+      });
+    });
+  }, [params]);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "5rem" }}>
+        Loading...
+      </div>
+    );
+  }
 
   if (!article) {
     return (
