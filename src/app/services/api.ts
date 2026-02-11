@@ -48,4 +48,18 @@ export async function fetchCategories(): Promise<string[]> {
   return Array.isArray(categories) ? categories : [];
 }
 
+export type Ad = {
+  _id: string;
+  title?: string;
+  imageUrl?: string;
+  link?: string;
+  adPosition?: number;
+  tags?: string[];
+};
+
+export async function fetchAds(language = "EN"): Promise<Ad[]> {
+  const json = await fetchJson<{ success?: boolean; data?: Ad[] }>("/api/ads", { language });
+  return Array.isArray(json?.data) ? json.data : [];
+}
+
 

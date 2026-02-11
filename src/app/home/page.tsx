@@ -30,8 +30,10 @@ import {
 } from "../Styles/HomeStyled";
 
 import NewsCard from "../components/NewsCard";
+import AdBanner from "../components/AdBanner";
 import { useApiList } from "../hooks/useApi";
-import { fetchCategories, fetchArticles } from "../services/api";
+import { fetchCategories, fetchArticles, fetchAds } from "../services/api";
+import type { Ad } from "../services/api";
 
 type ApiArticle = {
   id?: string | number;
@@ -138,6 +140,12 @@ export default function TopTrendingSection() {
   const [categoryNews, setCategoryNews] = useState<News[]>([]);
   const [isCategoryLoading, setIsCategoryLoading] = useState(false);
   const [categoryError, setCategoryError] = useState<string|null>(null);
+
+  // ----- Ads -----
+  const [ads, setAds] = useState<Ad[]>([]);
+  useEffect(() => {
+    fetchAds("EN").then(setAds).catch(() => setAds([]));
+  }, []);
 
   // ----- States -----
   const [current, setCurrent] = useState(0);
@@ -329,11 +337,43 @@ export default function TopTrendingSection() {
             ) : categoryError ? (
               <p style={{textAlign: 'center', color: '#c00'}}>{categoryError}</p>
             ) : (
-              <HeadlinesGrid>
-                {categoryNews.map((news, index) => (
-                  <NewsCard key={news.id} news={news} rank={index + 1} />
-                ))}
-              </HeadlinesGrid>
+              <>
+                {(() => {
+                  const sectionAds = ads
+                    .filter((a) => a.adPosition && a.adPosition >= 1 && a.adPosition <= categoryNews.length)
+                    .sort((a, b) => (a.adPosition || 0) - (b.adPosition || 0));
+
+                  const chunks: React.ReactNode[] = [];
+                  let lastCut = 0;
+
+                  for (const ad of sectionAds) {
+                    const cutAt = ad.adPosition!;
+                    if (cutAt > lastCut) {
+                      chunks.push(
+                        <HeadlinesGrid key={`cat-grid-${lastCut}-${cutAt}`}>
+                          {categoryNews.slice(lastCut, cutAt).map((news, i) => (
+                            <NewsCard key={news.id} news={news} rank={lastCut + i + 1} />
+                          ))}
+                        </HeadlinesGrid>
+                      );
+                    }
+                    chunks.push(<AdBanner key={`ad-${ad._id}`} ad={ad} />);
+                    lastCut = cutAt;
+                  }
+
+                  if (lastCut < categoryNews.length) {
+                    chunks.push(
+                      <HeadlinesGrid key={`cat-grid-${lastCut}-end`}>
+                        {categoryNews.slice(lastCut).map((news, i) => (
+                          <NewsCard key={news.id} news={news} rank={lastCut + i + 1} />
+                        ))}
+                      </HeadlinesGrid>
+                    );
+                  }
+
+                  return chunks;
+                })()}
+              </>
             )}
           </Section>
         </Container>
@@ -430,63 +470,143 @@ export default function TopTrendingSection() {
           </CategoriesWrapper>
         </Section>
 
-        {/* ---- TOP 10 HEADLINES ---- */}
+        {/* ---- TOP 10 HEADLINES (with ads between grid chunks) ---- */}
         <Section id="top-10-headlines">
           <HeadlinesSection>
             <Title>
               TOP <span>10</span> HEADLINES
             </Title>
-            <HeadlinesGrid>
-              {isLoading ? (
-                <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
-              ) : error ? (
-                <p style={{ textAlign: "center", color: "#c00" }}>{error}</p>
-              ) : topHeadlines.length > 0 ? (
-                topHeadlines.map((news, index) => (
-                  <NewsCard
-                    key={news.id}
-                    news={news}
-                    rank={index + 1}
-                    showRank={true}
-                    isExpanded={expandedId === news.id}
-                    onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
-                  />
-                ))
-              ) : (
-                <p style={{ textAlign: "center", color: "#999" }}>
-                  No headlines available for {selectedCategory}.
-                </p>
-              )}
-            </HeadlinesGrid>
+            {isLoading ? (
+              <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+            ) : error ? (
+              <p style={{ textAlign: "center", color: "#c00" }}>{error}</p>
+            ) : topHeadlines.length > 0 ? (
+              (() => {
+                // Find ad positions that fall within this section (1-based)
+                const sectionAds = ads
+                  .filter((a) => a.adPosition && a.adPosition >= 1 && a.adPosition <= topHeadlines.length)
+                  .sort((a, b) => (a.adPosition || 0) - (b.adPosition || 0));
+
+                // Build chunks: groups of news cards separated by ads
+                const chunks: React.ReactNode[] = [];
+                let lastCut = 0;
+
+                for (const ad of sectionAds) {
+                  const cutAt = ad.adPosition!; // e.g. 3 means after 3rd item
+                  if (cutAt > lastCut) {
+                    // Render news cards from lastCut to cutAt
+                    chunks.push(
+                      <HeadlinesGrid key={`grid-${lastCut}-${cutAt}`}>
+                        {topHeadlines.slice(lastCut, cutAt).map((news, i) => (
+                          <NewsCard
+                            key={news.id}
+                            news={news}
+                            rank={lastCut + i + 1}
+                            showRank={true}
+                            isExpanded={expandedId === news.id}
+                            onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
+                          />
+                        ))}
+                      </HeadlinesGrid>
+                    );
+                  }
+                  // Render the ad between grids
+                  chunks.push(<AdBanner key={`ad-${ad._id}`} ad={ad} />);
+                  lastCut = cutAt;
+                }
+
+                // Render remaining news cards after the last ad
+                if (lastCut < topHeadlines.length) {
+                  chunks.push(
+                    <HeadlinesGrid key={`grid-${lastCut}-end`}>
+                      {topHeadlines.slice(lastCut).map((news, i) => (
+                        <NewsCard
+                          key={news.id}
+                          news={news}
+                          rank={lastCut + i + 1}
+                          showRank={true}
+                          isExpanded={expandedId === news.id}
+                          onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
+                        />
+                      ))}
+                    </HeadlinesGrid>
+                  );
+                }
+
+                return chunks;
+              })()
+            ) : (
+              <p style={{ textAlign: "center", color: "#999" }}>
+                No headlines available for {selectedCategory}.
+              </p>
+            )}
           </HeadlinesSection>
         </Section>
 
-        {/* ---- MORE HEADLINES ---- */}
+        {/* ---- MORE HEADLINES (with ads between grid chunks) ---- */}
         <Section id="more-headlines">
           <HeadlinesSection>
             <Title>MORE HEADLINES</Title>
 
-            <HeadlinesGrid>
-              {isLoadingMore ? (
-                <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
-              ) : errorMore ? (
-                <p style={{ textAlign: "center", color: "#c00" }}>{errorMore}</p>
-              ) : moreHeadlines.length > 0 ? (
-                moreHeadlines.map((news, index) => (
-                  <NewsCard
-                    key={news.id}
-                    news={news}
-                    rank={index + 1}
-                    isExpanded={expandedId === news.id}
-                    onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
-                  />
-                ))
-              ) : (
-                <p style={{ textAlign: "center", color: "#999" }}>
-                  No more headlines for {selectedCategory}.
-                </p>
-              )}
-            </HeadlinesGrid>
+            {isLoadingMore ? (
+              <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+            ) : errorMore ? (
+              <p style={{ textAlign: "center", color: "#c00" }}>{errorMore}</p>
+            ) : moreHeadlines.length > 0 ? (
+              (() => {
+                const offset = topHeadlines.length; // e.g. 10
+                // Find ads that fall within the "more" section
+                const sectionAds = ads
+                  .filter((a) => a.adPosition && a.adPosition > offset && a.adPosition <= offset + moreHeadlines.length)
+                  .sort((a, b) => (a.adPosition || 0) - (b.adPosition || 0));
+
+                const chunks: React.ReactNode[] = [];
+                let lastCut = 0; // relative index within moreHeadlines
+
+                for (const ad of sectionAds) {
+                  const cutAt = ad.adPosition! - offset; // convert to relative index
+                  if (cutAt > lastCut) {
+                    chunks.push(
+                      <HeadlinesGrid key={`more-grid-${lastCut}-${cutAt}`}>
+                        {moreHeadlines.slice(lastCut, cutAt).map((news, i) => (
+                          <NewsCard
+                            key={news.id}
+                            news={news}
+                            rank={lastCut + i + 1}
+                            isExpanded={expandedId === news.id}
+                            onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
+                          />
+                        ))}
+                      </HeadlinesGrid>
+                    );
+                  }
+                  chunks.push(<AdBanner key={`ad-${ad._id}`} ad={ad} />);
+                  lastCut = cutAt;
+                }
+
+                if (lastCut < moreHeadlines.length) {
+                  chunks.push(
+                    <HeadlinesGrid key={`more-grid-${lastCut}-end`}>
+                      {moreHeadlines.slice(lastCut).map((news, i) => (
+                        <NewsCard
+                          key={news.id}
+                          news={news}
+                          rank={lastCut + i + 1}
+                          isExpanded={expandedId === news.id}
+                          onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
+                        />
+                      ))}
+                    </HeadlinesGrid>
+                  );
+                }
+
+                return chunks;
+              })()
+            ) : (
+              <p style={{ textAlign: "center", color: "#999" }}>
+                No more headlines for {selectedCategory}.
+              </p>
+            )}
 
             {!showAllHeadlines && filteredMore.length > 6 && (
               <ButtonWrapper>
