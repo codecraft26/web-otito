@@ -24,7 +24,7 @@ export function useApiList<T = unknown>(path: string, params?: Record<string, st
     }
     const qs = search.toString();
     return `${baseUrl}${path}${qs ? `?${qs}` : ""}`;
-  }, [baseUrl, path, paramsKey]);
+  }, [baseUrl, path, paramsKey, params]);
 
   useEffect(() => {
     const controller = new AbortController();

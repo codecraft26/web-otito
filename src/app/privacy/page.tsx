@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
         <List>
           <li>IP addresses;</li>
           <li>Domain servers; and</li>
-          <li>Other information with respect to Your device, interaction of Your device with the App and applications (collectively "Traffic Data”).</li>
+          <li>Other information with respect to Your device, interaction of Your device with the App and applications (collectively &quot;Traffic Data&quot;).</li>
         </List>
 
         <SectionTitle>Personal Information Collected</SectionTitle>
@@ -134,7 +134,7 @@ export default function PrivacyPolicyPage() {
 
         <SectionTitle>THIRD PARTY LINKS/ SOURCE ATTRIBUTIONS</SectionTitle>
         <Paragraph>
-          Our App may contain links to third party websites or applications. The inclusion or exclusion of the link does not imply any endorsement by OTITO of the website, the website's provider, or the information on the website. You agree and understand that privacy policies of these websites are not under Our control.
+          Our App may contain links to third party websites or applications. The inclusion or exclusion of the link does not imply any endorsement by OTITO of the website, the website&apos;s provider, or the information on the website. You agree and understand that privacy policies of these websites are not under Our control.
         </Paragraph>
         <Paragraph>
           OTITO does not make any representations concerning the privacy practices or policies of such third parties or terms of use of such websites, nor does OTITO guarantee the accuracy, integrity, or quality of the information, data, text, software, sound, photographs, graphics, videos, messages or other materials available on such websites.

@@ -1,6 +1,7 @@
 "use client";
 
 import styled from "styled-components";
+import Image from "next/image";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -58,21 +59,18 @@ const ImageContainer = styled.div`
   align-items: center;
 `;
 
-const StyledImage = styled.img<{ $customWidth?: string; $customHeight?: string }>`
+const StyledImageWrapper = styled.div<{ $customWidth?: string; $customHeight?: string }>`
+  position: relative;
   width: ${({ $customWidth }) => $customWidth || "577px"};
   height: ${({ $customHeight }) => $customHeight || "363px"};
   border-radius: 16px;
-  object-fit: cover;
+  overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
   @media (max-width: 1024px) {
     width: 100%;
     height: auto;
-  }
-
-  @media (max-width: 480px) {
-    width: 100%;
-    height: auto;
+    aspect-ratio: 16 / 9;
   }
 `;
 
@@ -206,7 +204,8 @@ const StoreButtons = styled.div`
   display: flex;
   gap: 16px;
 
-  img {
+  .store-img {
+    position: relative;
     width: 120px;
     height: 40px;
     cursor: pointer;
@@ -286,12 +285,17 @@ export default function FeaturePage() {
         <Section key={index} $reverse={index % 2 === 1}>
           <InnerContainer $reverse={index % 2 === 1}>
             <ImageContainer>
-              <StyledImage
-                src={section.image}
-                alt={section.title}
+              <StyledImageWrapper
                 $customWidth={section.customWidth}
                 $customHeight={section.customHeight}
-              />
+              >
+                <Image
+                  src={section.image}
+                  alt={section.title.replace(/<\/?[^>]+(>|$)/g, "")}
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
+              </StyledImageWrapper>
             </ImageContainer>
             <Content>
               <Title dangerouslySetInnerHTML={{ __html: section.title }} />
@@ -301,8 +305,22 @@ export default function FeaturePage() {
                 <StoreContainer>
                   <StoreText>Available on</StoreText>
                   <StoreButtons>
-                    <img src={section.playStoreImg} alt="Get it on Play Store" />
-                    <img src={section.appStoreImg} alt="Download on App Store" />
+                    <div className="store-img">
+                      <Image
+                        src={section.playStoreImg || ""}
+                        alt="Get it on Play Store"
+                        fill
+                        style={{ objectFit: "contain" }}
+                      />
+                    </div>
+                    <div className="store-img">
+                      <Image
+                        src={section.appStoreImg || ""}
+                        alt="Download on App Store"
+                        fill
+                        style={{ objectFit: "contain" }}
+                      />
+                    </div>
                   </StoreButtons>
                 </StoreContainer>
               ) : (
