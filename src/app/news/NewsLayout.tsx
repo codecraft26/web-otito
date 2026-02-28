@@ -27,18 +27,10 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({ article }) => {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % article.images.length);
-  };
 
-  const prevSlide = () => {
-    setCurrentSlide(
-      (prev) => (prev - 1 + article.images.length) % article.images.length
-    );
-  };
 
   return (
-     <Container>
+    <Container>
       <BackSection>
         <BackButton onClick={() => router.back()}>
           <IoArrowBackOutline />
