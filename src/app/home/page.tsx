@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Wrapper,
@@ -91,6 +91,7 @@ export default function TopTrendingSection() {
 function HomeInner() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
+  const router = useRouter();
 
   // ----- Search results -----
   const [searchResults, setSearchResults] = useState<News[]>([]);
@@ -455,7 +456,10 @@ function HomeInner() {
             ) : filteredSlides.length > 0 ? (
               filteredSlides.map((slide, index) => (
                 <Slide key={slide.id} $active={index === current}>
-                  <ImageWrapper>
+                  <ImageWrapper
+                    onClick={() => router.push(`/news/${slide.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
                     <StyledImage src={slide.image} alt={slide.caption} fill priority />
                     <Overlay />
                     <CaptionWrapper>
