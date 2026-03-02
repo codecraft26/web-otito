@@ -3,14 +3,36 @@
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Search, Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const isHomePage = pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const openSearch = () => {
+    setSearchOpen(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchValue("");
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchValue.trim();
+    if (!q) return;
+    closeSearch();
+    router.push(`/?q=${encodeURIComponent(q)}`);
+  };
 
   return (
     <NavBar>
@@ -29,7 +51,7 @@ export default function Navbar() {
 
         <RightControls>
           {/* Mobile search icon */}
-          <MobileSearch>
+          <MobileSearch onClick={openSearch}>
             <Search size={20} strokeWidth={1.8} />
           </MobileSearch>
 
@@ -60,11 +82,28 @@ export default function Navbar() {
           )}
 
           {/* Desktop search icon */}
-          <DesktopSearch>
+          <DesktopSearch onClick={openSearch}>
             <Search size={20} strokeWidth={1.8} />
           </DesktopSearch>
         </NavLinks>
       </NavLinksWrapper>
+
+      {searchOpen && (
+        <SearchBar onSubmit={handleSearchSubmit}>
+          <SearchInput
+            ref={inputRef}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            placeholder="Search news..."
+          />
+          <SearchSubmit type="submit">
+            <Search size={18} strokeWidth={1.8} />
+          </SearchSubmit>
+          <SearchClose type="button" onClick={closeSearch}>
+            <X size={18} />
+          </SearchClose>
+        </SearchBar>
+      )}
 
       <BottomLine />
     </NavBar>
@@ -218,4 +257,46 @@ const BottomLine = styled.div`
   height: 1px;
   background-color: #dcdcdc;
   margin-top: 0.8rem;
+`;
+
+const SearchBar = styled.form`
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-top: 1px solid #f0f0f0;
+`;
+
+const SearchInput = styled.input`
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  color: #222;
+  background: transparent;
+
+  &::placeholder {
+    color: #aaa;
+  }
+`;
+
+const SearchSubmit = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c75b27;
+  display: flex;
+  align-items: center;
+`;
+
+const SearchClose = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
 `;

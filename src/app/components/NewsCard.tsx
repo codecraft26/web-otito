@@ -54,7 +54,11 @@ export default function NewsCard({ news, rank = 0, showRank = false, isExpanded,
         </ImageWrapper>
         <CardText>
           <Title>{news.title}</Title>
-          <Description>{news.summary}</Description>
+          {expanded ? (
+            <FourLineDesc>{news.expandedText}</FourLineDesc>
+          ) : (
+            <TwoLineDesc>{news.summary}</TwoLineDesc>
+          )}
           {news.source && <SourceText>Source: {news.source}</SourceText>}
           {news.id && (
             <FullSummaryBtn onClick={handleSummaryClick}>
@@ -64,12 +68,6 @@ export default function NewsCard({ news, rank = 0, showRank = false, isExpanded,
         </CardText>
       </CardHeader>
 
-      {expanded && news.expandedText && (
-        <ExpandedOverlay>
-          <OverlayTitle>Summary</OverlayTitle>
-          <OverlayBody>{news.expandedText}</OverlayBody>
-        </ExpandedOverlay>
-      )}
     </CardContainer>
   );
 }
@@ -167,38 +165,32 @@ const Title = styled.h3`
   margin-bottom: 6px;
 `;
 
-const Description = styled.p`
+const TwoLineDesc = styled.p`
   font-size: 13px;
   font-family: "Poppins", sans-serif;
   color: #444;
   line-height: 1.4;
-  transition: all 0.3s ease;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+`;
+
+const FourLineDesc = styled.p`
+  font-size: 13px;
+  font-family: "Poppins", sans-serif;
+  color: #444;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 4;
 `;
 
 const SourceText = styled.div`
   margin-top: 6px;
   font-size: 12px;
   color: #666;
-`;
-
-const ExpandedOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  background: #fff;
-  padding: 16px;
-  overflow: auto;
-`;
-
-const OverlayTitle = styled.div`
-  font-weight: 700;
-  color: #E75113;
-  margin-bottom: 8px;
-`;
-
-const OverlayBody = styled.div`
-  font-size: 13px;
-  color: #444;
-  line-height: 1.5;
 `;
 
 const FullSummaryBtn = styled.button`
