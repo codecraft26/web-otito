@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
   Wrapper,
@@ -13,6 +14,8 @@ import {
   StyledImage,
   Overlay,
   Caption,
+  CaptionWrapper,
+  SlideBadge,
   Dots,
   Dot,
   CategoriesWrapper,
@@ -31,13 +34,15 @@ import {
 
 import NewsCard from "../components/NewsCard";
 import { useApiList } from "../hooks/useApi";
-import { fetchCategories, fetchArticles } from "../services/api";
+import { fetchCategories, fetchArticles, fetchJson } from "../services/api";
 
 type ApiArticle = {
   id?: string | number;
   _id?: string;
   title?: string;
   headline?: string;
+  twoLineDescription?: string;
+  fourLineDescription?: string;
   summary?: string;
   description?: string;
   image?: string;
@@ -72,9 +77,65 @@ type News = {
   summary?: string;
   image?: string;
   expandedText?: string;
+  source?: string;
 };
 
 export default function TopTrendingSection() {
+  return (
+    <Suspense>
+      <HomeInner />
+    </Suspense>
+  );
+}
+
+function HomeInner() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("q") ?? "";
+
+  // ----- Search results -----
+  const [searchResults, setSearchResults] = useState<News[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    let active = true;
+    setSearchLoading(true);
+    setSearchError(null);
+    fetchJson<unknown>("/api/articles/search", { query: searchQuery, language: "EN", page: "1", limit: "20" } as Record<string, string>)
+      .then((json) => {
+        const obj = json as Record<string, unknown>;
+        const nested = obj.data as Record<string, unknown> | undefined;
+        return (
+          Array.isArray(json) ? json :
+          Array.isArray(obj.articles) ? obj.articles :
+          nested && Array.isArray(nested.articles) ? nested.articles :
+          Array.isArray(obj.data) ? obj.data :
+          []
+        ) as unknown[];
+      })
+      .then((data) => {
+        if (!active) return;
+        setSearchResults((data || []).map((item, idx) => {
+          const a = item as LooseArticle;
+          return {
+            id: a.id ?? a._id ?? `sr-${idx}`,
+            title: a.title ?? a.headline ?? "Untitled",
+            summary: a.twoLineDescription ?? a.summary ?? a.description ?? undefined,
+            expandedText: a.fourLineDescription ?? a.content ?? undefined,
+            image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
+            source: deriveSource(a),
+          };
+        }));
+      })
+      .catch((e) => { if (active) setSearchError(e?.message ?? "Search failed"); })
+      .finally(() => { if (active) setSearchLoading(false); });
+    return () => { active = false; };
+  }, [searchQuery]);
+
   // ----- Trending Slides (fetched per selected category) -----
   type Slide = { id: string | number; image: string; caption: string; category: string };
 
@@ -152,20 +213,27 @@ export default function TopTrendingSection() {
     return name;
   }, [selectedCategory]);
 
+  // Map certain slugs to the DB-stored category names
+  const apiCategoryParam = useMemo(() => {
+    if (!apiCategory) return undefined;
+    if (apiCategory.toLowerCase() === "domestic") return "India";
+    return apiCategory;
+  }, [apiCategory]);
+
   const top10Params = useMemo<Record<string, string | string[]>>(() => {
-    if (apiCategory) {
-      return { "category[]": [apiCategory], page: "1", limit: "10", language: "EN" };
+    if (apiCategoryParam) {
+      return { "category[]": [apiCategoryParam], page: "1", limit: "10", language: "EN" };
     }
     return { page: "1", limit: "10", language: "EN" } as Record<string, string>;
-  }, [apiCategory]);
+  }, [apiCategoryParam]);
 
   // Slides depend on selected category
   const slidesParams = useMemo<Record<string, string | string[]>>(() => {
-    if (apiCategory) {
-      return { "category[]": [apiCategory], language: "EN", page: "1", limit: "5" };
+    if (apiCategoryParam) {
+      return { "category[]": [apiCategoryParam], language: "EN", page: "1", limit: "5" };
     }
     return { "category[]": ["top"], language: "EN", page: "1", limit: "5" };
-  }, [apiCategory]);
+  }, [apiCategoryParam]);
 
   const { data: topRaw, loading: slidesLoading, error: slidesError } = useApiList<ApiArticle>(
     "/api/articles",
@@ -196,8 +264,8 @@ export default function TopTrendingSection() {
     const mapped = top10Raw.map((a, idx) => ({
       id: a.id ?? a._id ?? `${idx}`,
       title: a.title ?? a.headline ?? "Untitled",
-      summary: a.summary ?? a.description ?? undefined,
-      expandedText: a.content ?? a.description ?? undefined,
+      summary: a.twoLineDescription ?? a.summary ?? a.description ?? undefined,
+      expandedText: a.fourLineDescription ?? a.content ?? undefined,
       image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
       category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
       source: deriveSource(a as LooseArticle),
@@ -206,11 +274,11 @@ export default function TopTrendingSection() {
   }, [top10Raw, top10Loading, top10Error]);
 
   const moreParams = useMemo<Record<string, string | string[]>>(() => {
-    if (apiCategory) {
-      return { "category[]": [apiCategory], language: "EN", page: "1", limit: "10" };
+    if (apiCategoryParam) {
+      return { "category[]": [apiCategoryParam], language: "EN", page: "1", limit: "10" };
     }
     return { "category[]": ["crime", "technology"], language: "EN", page: "1", limit: "10" };
-  }, [apiCategory]);
+  }, [apiCategoryParam]);
 
   const { data: moreRaw, loading: moreLoading, error: moreErr } = useApiList<ApiArticle>(
     "/api/articles",
@@ -222,8 +290,8 @@ export default function TopTrendingSection() {
     const mapped = moreRaw.map((a, idx) => ({
       id: a.id ?? a._id ?? `more-${idx}`,
       title: a.title ?? a.headline ?? "Untitled",
-      summary: a.summary ?? a.description ?? undefined,
-      expandedText: a.content ?? a.description ?? undefined,
+      summary: a.twoLineDescription ?? a.summary ?? a.description ?? undefined,
+      expandedText: a.fourLineDescription ?? a.content ?? undefined,
       image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
       category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
       source: deriveSource(a as LooseArticle),
@@ -237,7 +305,8 @@ export default function TopTrendingSection() {
     if (selectedCategory !== "All") {
       setIsCategoryLoading(true);
       setCategoryError(null);
-      fetchArticles({ "category[]": [selectedCategory], page: "1", limit: "100", language: "EN" })
+      const catParam = selectedCategory.toLowerCase() === "domestic" ? "India" : selectedCategory;
+      fetchArticles({ "category[]": [catParam], page: "1", limit: "100", language: "EN" })
         .then((data) => {
           if (!active) return;
           setCategoryNews((data || []).map((item, idx) => {
@@ -311,6 +380,37 @@ export default function TopTrendingSection() {
   }, [moreApiHeadlines, selectedCategory, apiCategory]);
   const moreHeadlines = showAllHeadlines ? filteredMore : filteredMore.slice(0, 6);
 
+  // ----- Search results view -----
+  if (searchQuery.trim()) {
+    return (
+      <Wrapper>
+        <Container>
+          <Section>
+            <Title>Search results for: &ldquo;{searchQuery}&rdquo;</Title>
+            <ButtonWrapper>
+              <ViewMoreButton onClick={() => window.history.pushState({}, "", "/")}>Clear search</ViewMoreButton>
+            </ButtonWrapper>
+          </Section>
+          <Section>
+            {searchLoading ? (
+              <p style={{ textAlign: "center", color: "#999" }}>Searching...</p>
+            ) : searchError ? (
+              <p style={{ textAlign: "center", color: "#c00" }}>{searchError}</p>
+            ) : searchResults.length > 0 ? (
+              <HeadlinesGrid>
+                {searchResults.map((news, index) => (
+                  <NewsCard key={news.id} news={news} rank={index + 1} />
+                ))}
+              </HeadlinesGrid>
+            ) : (
+              <p style={{ textAlign: "center", color: "#999" }}>No results found for &ldquo;{searchQuery}&rdquo;</p>
+            )}
+          </Section>
+        </Container>
+      </Wrapper>
+    );
+  }
+
   if (selectedCategory !== "All" && categoryNews.length > 0) {
     return (
       <Wrapper>
@@ -358,7 +458,10 @@ export default function TopTrendingSection() {
                   <ImageWrapper>
                     <StyledImage src={slide.image} alt={slide.caption} fill priority />
                     <Overlay />
-                    <Caption>{slide.caption}</Caption>
+                    <CaptionWrapper>
+                      <SlideBadge>Top Trending</SlideBadge>
+                      <Caption>{slide.caption}</Caption>
+                    </CaptionWrapper>
                   </ImageWrapper>
                 </Slide>
               ))

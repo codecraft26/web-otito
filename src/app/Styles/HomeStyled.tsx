@@ -109,11 +109,31 @@ export const Overlay = styled.div`
   border-radius: 16px;
 `;
 
-export const Caption = styled.p`
+export const SlideBadge = styled.span`
+  display: inline-block;
+  background-color: #fff;
+  color: #e75113;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 3px 12px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+`;
+
+export const CaptionWrapper = styled.div`
   position: absolute;
   bottom: 14px;
   left: 16px;
   right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+export const Caption = styled.p`
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
