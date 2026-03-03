@@ -126,11 +126,12 @@ export const SlideBadge = styled.span`
 export const CaptionWrapper = styled.div`
   position: absolute;
   bottom: 14px;
-  left: 16px;
+  left: 0;
   right: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-left: 4px;
 `;
 
 export const Caption = styled.p`
