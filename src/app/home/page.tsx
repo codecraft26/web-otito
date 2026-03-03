@@ -315,8 +315,8 @@ function HomeInner() {
             return {
               id: a.id ?? a._id ?? `${idx}`,
               title: a.title ?? a.headline ?? "Untitled",
-              summary: a.summary ?? a.description ?? undefined,
-              expandedText: a.content ?? a.description ?? undefined,
+              summary: a.twoLineDescription ?? a.summary ?? a.description ?? undefined,
+              expandedText: a.fourLineDescription ?? a.content ?? undefined,
               image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
               source: deriveSource(a),
             };
