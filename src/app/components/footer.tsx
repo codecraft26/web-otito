@@ -21,6 +21,7 @@ export default function Footer() {
           <StyledLink href="/terms">Terms & Conditions</StyledLink>
           <StyledLink href="/privacy">Privacy Policy</StyledLink>
           <StyledLink href="/contactus">Contact Us</StyledLink>
+          <StyledLink href="/advertise">Advertise With Us</StyledLink>
         </FooterNav>
 
         <LogoWrapper>
