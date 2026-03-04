@@ -6,13 +6,13 @@ import styled from "styled-components";
 const PREFERRED_MODES = ["Email", "Phone", "WhatsApp"];
 const LANGUAGES = ["Hindi", "English"];
 const LOCATIONS = [
-  "news_feed",
-  "swipe",
-  "photo_story",
-  "trending",
-  "headlines",
-  "video_story",
-  "other_headlines",
+  "News Feed",
+  "Swipe",
+  "Photo Story",
+  "Trending",
+  "Headlines",
+  "Video Story",
+  "Other Headlines",
 ];
 
 export default function AdvertisePage() {
