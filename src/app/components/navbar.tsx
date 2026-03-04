@@ -251,6 +251,7 @@ const StyledLink = styled(Link)`
   }
 `;
 
+
 const BottomLine = styled.div`
   width: 90%;
   max-width: 1600px;
