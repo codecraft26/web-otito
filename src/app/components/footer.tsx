@@ -40,6 +40,13 @@ export default function Footer() {
           full stories when you want more context.
         </FooterText>
 
+        <FooterAddress>
+          <strong>OTITO MEDIA PRIVATE LIMITED</strong><br />
+          R-3/201, Shivshadan SOC, Cly Nirlon, Goregaon East,<br />
+          Sharma Estate, Goregaon East, Mumbai, Maharashtra – 400063, India<br />
+          +91 90764 37932 | team@otito.in
+        </FooterAddress>
+
         <SocialIcons>
           <IconWrapper
             as="a"
@@ -160,6 +167,26 @@ const LogoWrapper = styled.div`
 
   @media (max-width: 480px) {
     margin: 1rem 0 0.8rem;
+  }
+`;
+
+const FooterAddress = styled.p`
+  max-width: 700px;
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: #fff;
+  opacity: 0.85;
+  margin-bottom: 2rem;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 0.82rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.78rem;
+    padding: 0 0.5rem;
   }
 `;
 
