@@ -3,6 +3,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
+import { useLanguage } from "../contexts/LanguageContext";
 import {
   FaInstagram,
   FaLinkedinIn,
@@ -11,17 +12,18 @@ import {
 } from "react-icons/fa";
 
 export default function Footer() {
+  const { t } = useLanguage();
   return (
     <FooterContainer>
       <FooterTop>
         <FooterNav>
-          <StyledLink href="/">Home</StyledLink>
-          <StyledLink href="/features">About</StyledLink>
-          <StyledLink href="/#more-headlines">News</StyledLink>
-          <StyledLink href="/terms">Terms & Conditions</StyledLink>
-          <StyledLink href="/privacy">Privacy Policy</StyledLink>
-          <StyledLink href="/contactus">Contact Us</StyledLink>
-          <StyledLink href="/advertise">Advertise With Us</StyledLink>
+          <StyledLink href="/">{t("footerHome")}</StyledLink>
+          <StyledLink href="/features">{t("footerAbout")}</StyledLink>
+          <StyledLink href="/#more-headlines">{t("footerNews")}</StyledLink>
+          <StyledLink href="/terms">{t("footerTerms")}</StyledLink>
+          <StyledLink href="/privacy">{t("footerPrivacy")}</StyledLink>
+          <StyledLink href="/contactus">{t("footerContact")}</StyledLink>
+          <StyledLink href="/advertise">{t("footerAdvertise")}</StyledLink>
         </FooterNav>
 
         <LogoWrapper>
@@ -34,11 +36,7 @@ export default function Footer() {
           />
         </LogoWrapper>
 
-        <FooterText>
-          Otito brings you concise, trustworthy news across categories — updated
-          throughout the day. Stay informed with quick summaries and jump into
-          full stories when you want more context.
-        </FooterText>
+        <FooterText>{t("footerTagline")}</FooterText>
 
         <FooterAddress>
           <strong>OTITO MEDIA PRIVATE LIMITED</strong><br />

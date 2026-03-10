@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
+import { useLanguage } from "../contexts/LanguageContext";
 
 // ---- Types ----
 type News = {
@@ -24,6 +25,7 @@ type Props = {
 // ---- Component ----
 export default function NewsCard({ news, rank = 0, showRank = false, isExpanded, onToggle }: Props) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [internalExpanded, setInternalExpanded] = useState<boolean>(false);
   const expanded = typeof isExpanded === 'boolean' ? isExpanded : internalExpanded;
 
@@ -59,10 +61,10 @@ export default function NewsCard({ news, rank = 0, showRank = false, isExpanded,
           ) : (
             <TwoLineDesc>{news.summary}</TwoLineDesc>
           )}
-          {news.source && <SourceText>Source: {news.source}</SourceText>}
+          {news.source && <SourceText>{t("source")} {news.source}</SourceText>}
           {news.id && (
             <FullSummaryBtn onClick={handleSummaryClick}>
-              Full Summary
+              {t("fullSummary")}
             </FullSummaryBtn>
           )}
         </CardText>

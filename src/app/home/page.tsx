@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import { useLanguage } from "../contexts/LanguageContext";
+import { categoryNames } from "../i18n/translations";
 import {
   Wrapper,
   Container,
@@ -92,6 +94,8 @@ function HomeInner() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
   const router = useRouter();
+  const { language, t } = useLanguage();
+  const getCatName = (slug: string) => categoryNames[language][slug] ?? (slug.charAt(0).toUpperCase() + slug.slice(1));
 
   // ----- Search results -----
   const [searchResults, setSearchResults] = useState<News[]>([]);
@@ -106,7 +110,7 @@ function HomeInner() {
     let active = true;
     setSearchLoading(true);
     setSearchError(null);
-    fetchJson<unknown>("/api/articles/search", { query: searchQuery, language: "EN", page: "1", limit: "20" } as Record<string, string>)
+    fetchJson<unknown>("/api/articles/search", { query: searchQuery, language, page: "1", limit: "20" } as Record<string, string>)
       .then((json) => {
         const obj = json as Record<string, unknown>;
         const nested = obj.data as Record<string, unknown> | undefined;
@@ -135,7 +139,7 @@ function HomeInner() {
       .catch((e) => { if (active) setSearchError(e?.message ?? "Search failed"); })
       .finally(() => { if (active) setSearchLoading(false); });
     return () => { active = false; };
-  }, [searchQuery]);
+  }, [searchQuery, language]);
 
   // ----- Trending Slides (fetched per selected category) -----
   type Slide = { id: string | number; image: string; caption: string; category: string };
@@ -223,18 +227,18 @@ function HomeInner() {
 
   const top10Params = useMemo<Record<string, string | string[]>>(() => {
     if (apiCategoryParam) {
-      return { "category[]": [apiCategoryParam], page: "1", limit: "10", language: "EN" };
+      return { "category[]": [apiCategoryParam], page: "1", limit: "10", language };
     }
-    return { page: "1", limit: "10", language: "EN" } as Record<string, string>;
-  }, [apiCategoryParam]);
+    return { page: "1", limit: "10", language } as Record<string, string>;
+  }, [apiCategoryParam, language]);
 
   // Slides depend on selected category
   const slidesParams = useMemo<Record<string, string | string[]>>(() => {
     if (apiCategoryParam) {
-      return { "category[]": [apiCategoryParam], language: "EN", page: "1", limit: "5" };
+      return { "category[]": [apiCategoryParam], language, page: "1", limit: "5" };
     }
-    return { "category[]": ["top"], language: "EN", page: "1", limit: "5" };
-  }, [apiCategoryParam]);
+    return { "category[]": ["top"], language, page: "1", limit: "5" };
+  }, [apiCategoryParam, language]);
 
   const { data: topRaw, loading: slidesLoading, error: slidesError } = useApiList<ApiArticle>(
     "/api/articles",
@@ -276,10 +280,10 @@ function HomeInner() {
 
   const moreParams = useMemo<Record<string, string | string[]>>(() => {
     if (apiCategoryParam) {
-      return { "category[]": [apiCategoryParam], language: "EN", page: "1", limit: "10" };
+      return { "category[]": [apiCategoryParam], language, page: "1", limit: "10" };
     }
-    return { "category[]": ["crime", "technology"], language: "EN", page: "1", limit: "10" };
-  }, [apiCategoryParam]);
+    return { "category[]": ["crime", "technology"], language, page: "1", limit: "10" };
+  }, [apiCategoryParam, language]);
 
   const { data: moreRaw, loading: moreLoading, error: moreErr } = useApiList<ApiArticle>(
     "/api/articles",
@@ -307,7 +311,7 @@ function HomeInner() {
       setIsCategoryLoading(true);
       setCategoryError(null);
       const catParam = selectedCategory.toLowerCase() === "domestic" ? "India" : selectedCategory;
-      fetchArticles({ "category[]": [catParam], page: "1", limit: "100", language: "EN" })
+      fetchArticles({ "category[]": [catParam], page: "1", limit: "100", language })
         .then((data) => {
           if (!active) return;
           setCategoryNews((data || []).map((item, idx) => {
@@ -338,7 +342,7 @@ function HomeInner() {
     return () => {
       active = false;
     };
-  }, [selectedCategory]);
+  }, [selectedCategory, language]);
 
   // Filter logic
   const filteredSlides = useMemo(() => {
@@ -387,14 +391,14 @@ function HomeInner() {
       <Wrapper>
         <Container>
           <Section>
-            <Title>Search results for: &ldquo;{searchQuery}&rdquo;</Title>
+            <Title>{t("searchResultsFor")} &ldquo;{searchQuery}&rdquo;</Title>
             <ButtonWrapper>
-              <ViewMoreButton onClick={() => window.history.pushState({}, "", "/")}>Clear search</ViewMoreButton>
+              <ViewMoreButton onClick={() => window.history.pushState({}, "", "/")}>{t("clearSearch")}</ViewMoreButton>
             </ButtonWrapper>
           </Section>
           <Section>
             {searchLoading ? (
-              <p style={{ textAlign: "center", color: "#999" }}>Searching...</p>
+              <p style={{ textAlign: "center", color: "#999" }}>{t("searching")}</p>
             ) : searchError ? (
               <p style={{ textAlign: "center", color: "#c00" }}>{searchError}</p>
             ) : searchResults.length > 0 ? (
@@ -404,7 +408,7 @@ function HomeInner() {
                 ))}
               </HeadlinesGrid>
             ) : (
-              <p style={{ textAlign: "center", color: "#999" }}>No results found for &ldquo;{searchQuery}&rdquo;</p>
+              <p style={{ textAlign: "center", color: "#999" }}>{t("noResults")} &ldquo;{searchQuery}&rdquo;</p>
             )}
           </Section>
         </Container>
@@ -418,15 +422,15 @@ function HomeInner() {
         <Container>
           <Section>
             <Title>
-              News in category: {categories.find(c => c.slug === selectedCategory)?.name ?? selectedCategory}
+              {t("newsInCategory")} {getCatName(selectedCategory)}
             </Title>
             <ButtonWrapper>
-              <ViewMoreButton onClick={() => setSelectedCategory("All")}>Back to All News</ViewMoreButton>
+              <ViewMoreButton onClick={() => setSelectedCategory("All")}>{t("backToAll")}</ViewMoreButton>
             </ButtonWrapper>
           </Section>
           <Section>
             {isCategoryLoading ? (
-              <p style={{textAlign: 'center', color: '#999'}}>Loading...</p>
+              <p style={{textAlign: 'center', color: '#999'}}>{t("loading")}</p>
             ) : categoryError ? (
               <p style={{textAlign: 'center', color: '#c00'}}>{categoryError}</p>
             ) : (
@@ -447,10 +451,10 @@ function HomeInner() {
       <Container>
         {/* ---- TOP TRENDINGS ---- */}
         <Section id="top-trendings">
-          <Title>TOP TRENDINGS</Title>
+          <Title>{t("topTrending")}</Title>
           <Slider>
             {slidesLoading ? (
-              <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+              <p style={{ textAlign: "center", color: "#999" }}>{t("loading")}</p>
             ) : slidesError ? (
               <p style={{ textAlign: "center", color: "#c00" }}>{slidesError}</p>
             ) : filteredSlides.length > 0 ? (
@@ -463,7 +467,7 @@ function HomeInner() {
                     <StyledImage src={slide.image} alt={slide.caption} fill priority />
                     <Overlay />
                     <CaptionWrapper>
-                      <SlideBadge>Top Trending</SlideBadge>
+                      <SlideBadge>{t("topTrendingBadge")}</SlideBadge>
                       <Caption>{slide.caption}</Caption>
                     </CaptionWrapper>
                   </ImageWrapper>
@@ -471,7 +475,7 @@ function HomeInner() {
               ))
             ) : (
               <p style={{ textAlign: "center", color: "#999" }}>
-                No trending news available for {selectedCategory}.
+                {t("noTrending")} {selectedCategory}.
               </p>
             )}
           </Slider>
@@ -487,9 +491,9 @@ function HomeInner() {
         <Section id="categories">
           <CategoriesWrapper>
             <CategoriesHeader>
-              <Title>CATEGORIES</Title>
+              <Title>{t("categories")}</Title>
               <SeeAllButton onClick={() => setShowAllCategories(!showAllCategories)}>
-                {showAllCategories ? "Close" : "See All"}
+                {showAllCategories ? t("close") : t("seeAll")}
               </SeeAllButton>
             </CategoriesHeader>
 
@@ -507,9 +511,9 @@ function HomeInner() {
                     }}
                   >
                     <CategoryIcon>
-                      <Image src={cat.icon} alt={cat.name} width={60} height={60} />
+                      <Image src={cat.icon} alt={getCatName(cat.slug)} width={60} height={60} />
                     </CategoryIcon>
-                    <CategoryText>{cat.name}</CategoryText>
+                    <CategoryText>{getCatName(cat.slug)}</CategoryText>
                   </CategoryButton>
                 ))}
               </CategoriesScroll>
@@ -527,9 +531,9 @@ function HomeInner() {
                     }}
                   >
                     <CategoryIcon>
-                      <Image src={cat.icon} alt={cat.name} width={60} height={60} />
+                      <Image src={cat.icon} alt={getCatName(cat.slug)} width={60} height={60} />
                     </CategoryIcon>
-                    <CategoryText>{cat.name}</CategoryText>
+                    <CategoryText>{getCatName(cat.slug)}</CategoryText>
                   </CategoryButton>
                 ))}
               </CategoriesGrid>
@@ -540,12 +544,10 @@ function HomeInner() {
         {/* ---- TOP 10 HEADLINES ---- */}
         <Section id="top-10-headlines">
           <HeadlinesSection>
-            <Title>
-              TOP <span>10</span> HEADLINES
-            </Title>
+            <Title>{t("top10Headlines")}</Title>
             <HeadlinesGrid>
               {isLoading ? (
-                <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+                <p style={{ textAlign: "center", color: "#999" }}>{t("loading")}</p>
               ) : error ? (
                 <p style={{ textAlign: "center", color: "#c00" }}>{error}</p>
               ) : topHeadlines.length > 0 ? (
@@ -561,7 +563,7 @@ function HomeInner() {
                 ))
               ) : (
                 <p style={{ textAlign: "center", color: "#999" }}>
-                  No headlines available for {selectedCategory}.
+                  {t("noHeadlines")} {selectedCategory}.
                 </p>
               )}
             </HeadlinesGrid>
@@ -571,11 +573,11 @@ function HomeInner() {
         {/* ---- MORE HEADLINES ---- */}
         <Section id="more-headlines">
           <HeadlinesSection>
-            <Title>MORE HEADLINES</Title>
+            <Title>{t("moreHeadlines")}</Title>
 
             <HeadlinesGrid>
               {isLoadingMore ? (
-                <p style={{ textAlign: "center", color: "#999" }}>Loading...</p>
+                <p style={{ textAlign: "center", color: "#999" }}>{t("loading")}</p>
               ) : errorMore ? (
                 <p style={{ textAlign: "center", color: "#c00" }}>{errorMore}</p>
               ) : moreHeadlines.length > 0 ? (
@@ -590,7 +592,7 @@ function HomeInner() {
                 ))
               ) : (
                 <p style={{ textAlign: "center", color: "#999" }}>
-                  No more headlines for {selectedCategory}.
+                  {t("noMoreHeadlines")} {selectedCategory}.
                 </p>
               )}
             </HeadlinesGrid>
@@ -598,7 +600,7 @@ function HomeInner() {
             {!showAllHeadlines && filteredMore.length > 6 && (
               <ButtonWrapper>
                 <ViewMoreButton onClick={() => setShowAllHeadlines(true)}>
-                  View More
+                  {t("viewMore")}
                 </ViewMoreButton>
               </ButtonWrapper>
             )}

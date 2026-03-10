@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const PREFERRED_MODES = ["Email", "Phone", "WhatsApp"];
 const LANGUAGES = ["Hindi", "English"];
@@ -16,6 +17,7 @@ const LOCATIONS = [
 ];
 
 export default function AdvertisePage() {
+  const { t } = useLanguage();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -34,7 +36,7 @@ export default function AdvertisePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.contact || !form.preferredMode) {
-      setErrorMsg("Please fill in all fields.");
+      setErrorMsg(t("fillAllFields"));
       return;
     }
     setStatus("loading");
@@ -58,29 +60,25 @@ export default function AdvertisePage() {
   return (
     <PageWrapper>
       <Card>
-        <Heading>Advertise With Us</Heading>
-        <Subtext>
-          Reach millions of readers across India. Fill in your details and our team will get back to you within 1–2 business days.
-        </Subtext>
+        <Heading>{t("advertiseTitle")}</Heading>
+        <Subtext>{t("advertiseSubtext")}</Subtext>
 
         {status === "success" ? (
           <SuccessBox>
             <SuccessIcon>✓</SuccessIcon>
-            <SuccessTitle>Enquiry Submitted!</SuccessTitle>
-            <SuccessMsg>
-              Thank you for your interest. We&apos;ve sent a confirmation to your email and will reach out to you shortly.
-            </SuccessMsg>
-            <RetryBtn onClick={() => setStatus("idle")}>Submit Another</RetryBtn>
+            <SuccessTitle>{t("enquirySubmitted")}</SuccessTitle>
+            <SuccessMsg>{t("successMsg")}</SuccessMsg>
+            <RetryBtn onClick={() => setStatus("idle")}>{t("submitAnother")}</RetryBtn>
           </SuccessBox>
         ) : (
           <Form onSubmit={handleSubmit}>
             <Field>
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="name">{t("name")}</Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
-                placeholder="Your full name"
+                placeholder={t("namePlaceholder")}
                 value={form.name}
                 onChange={handleChange}
                 required
@@ -88,12 +86,12 @@ export default function AdvertisePage() {
             </Field>
 
             <Field>
-              <Label htmlFor="email">Email *</Label>
+              <Label htmlFor="email">{t("email")}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("emailPlaceholder")}
                 value={form.email}
                 onChange={handleChange}
                 required
@@ -101,12 +99,12 @@ export default function AdvertisePage() {
             </Field>
 
             <Field>
-              <Label htmlFor="contact">Contact Number *</Label>
+              <Label htmlFor="contact">{t("contact")}</Label>
               <Input
                 id="contact"
                 name="contact"
                 type="tel"
-                placeholder="+91 00000 00000"
+                placeholder={t("contactPlaceholder")}
                 value={form.contact}
                 onChange={handleChange}
                 required
@@ -114,7 +112,7 @@ export default function AdvertisePage() {
             </Field>
 
             <Field>
-              <Label htmlFor="preferredMode">Preferred Mode of Communication *</Label>
+              <Label htmlFor="preferredMode">{t("preferredMode")}</Label>
               <Select
                 id="preferredMode"
                 name="preferredMode"
@@ -122,7 +120,7 @@ export default function AdvertisePage() {
                 onChange={handleChange}
                 required
               >
-                <option value="" disabled>Select a mode</option>
+                <option value="" disabled>{t("selectMode")}</option>
                 {PREFERRED_MODES.map((mode) => (
                   <option key={mode} value={mode}>{mode}</option>
                 ))}
@@ -130,14 +128,14 @@ export default function AdvertisePage() {
             </Field>
 
             <Field>
-              <Label htmlFor="language">Language</Label>
+              <Label htmlFor="language">{t("language")}</Label>
               <Select
                 id="language"
                 name="language"
                 value={form.language}
                 onChange={handleChange}
               >
-                <option value="" disabled>Select a language</option>
+                <option value="" disabled>{t("selectLanguage")}</option>
                 {LANGUAGES.map((lang) => (
                   <option key={lang} value={lang}>{lang}</option>
                 ))}
@@ -145,14 +143,14 @@ export default function AdvertisePage() {
             </Field>
 
             <Field>
-              <Label htmlFor="location">Ad Placement Location</Label>
+              <Label htmlFor="location">{t("adLocation")}</Label>
               <Select
                 id="location"
                 name="location"
                 value={form.location}
                 onChange={handleChange}
               >
-                <option value="" disabled>Select a location</option>
+                <option value="" disabled>{t("selectLocation")}</option>
                 {LOCATIONS.map((loc) => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
@@ -162,7 +160,7 @@ export default function AdvertisePage() {
             {errorMsg && <ErrorMsg>{errorMsg}</ErrorMsg>}
 
             <SubmitBtn type="submit" disabled={status === "loading"}>
-              {status === "loading" ? "Submitting…" : "Submit Enquiry"}
+              {status === "loading" ? t("submitting") : t("submitEnquiry")}
             </SubmitBtn>
           </Form>
         )}

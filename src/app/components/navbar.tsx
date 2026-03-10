@@ -6,11 +6,13 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, Menu, X } from "lucide-react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const isHomePage = pathname === "/";
+  const { language, toggleLanguage, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -55,6 +57,12 @@ export default function Navbar() {
             <Search size={20} strokeWidth={1.8} />
           </MobileSearch>
 
+          <LangPillMobile onClick={toggleLanguage}>
+            <LangOption $active={language === "EN"}>English</LangOption>
+            <LangSep>|</LangSep>
+            <LangOption $active={language === "HI"}>Hindi</LangOption>
+          </LangPillMobile>
+
           <Hamburger onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={26} /> : <Menu size={26} />}
           </Hamburger>
@@ -63,23 +71,30 @@ export default function Navbar() {
 
       <NavLinksWrapper $menuOpen={menuOpen}>
         <NavLinks $menuOpen={menuOpen}>
-          <StyledLink href="/">HOME</StyledLink>
+          <StyledLink href="/">{t("home")}</StyledLink>
 
           {isHomePage ? (
             <>
-              <StyledLink href="/feature">OUR FEATURES</StyledLink>
-              <StyledLink href="/#top-trendings">TOP TRENDINGS</StyledLink>
-              <StyledLink href="/#categories">CATEGORIES</StyledLink>
-              <StyledLink href="/#top-10-headlines">TOP 10 HEADLINES</StyledLink>
-              <StyledLink href="/#more-headlines">MORE HEADLINES</StyledLink>
+              <StyledLink href="/feature">{t("ourFeatures")}</StyledLink>
+              <StyledLink href="/#top-trendings">{t("topTrending")}</StyledLink>
+              <StyledLink href="/#categories">{t("categories")}</StyledLink>
+              <StyledLink href="/#top-10-headlines">{t("top10Headlines")}</StyledLink>
+              <StyledLink href="/#more-headlines">{t("moreHeadlines")}</StyledLink>
             </>
           ) : (
             <>
-              <StyledLink href="/feature">OUR FEATURES</StyledLink>
-              <StyledLink href="/#categories">CATEGORIES</StyledLink>
-              <StyledLink href="/#top-10-headlines">TOP 10 HEADLINES</StyledLink>
+              <StyledLink href="/feature">{t("ourFeatures")}</StyledLink>
+              <StyledLink href="/#categories">{t("categories")}</StyledLink>
+              <StyledLink href="/#top-10-headlines">{t("top10Headlines")}</StyledLink>
             </>
           )}
+
+          {/* Language toggle (desktop) */}
+          <LangPillDesktop onClick={toggleLanguage}>
+            <LangOption $active={language === "EN"}>English</LangOption>
+            <LangSep>|</LangSep>
+            <LangOption $active={language === "HI"}>Hindi</LangOption>
+          </LangPillDesktop>
 
           {/* Desktop search icon */}
           <DesktopSearch onClick={openSearch}>
@@ -94,7 +109,7 @@ export default function Navbar() {
             ref={inputRef}
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search news..."
+            placeholder={t("search")}
           />
           <SearchSubmit type="submit">
             <Search size={18} strokeWidth={1.8} />
@@ -300,4 +315,47 @@ const SearchClose = styled.button`
   color: #666;
   display: flex;
   align-items: center;
+`;
+
+const LangPillMobile = styled.button`
+  display: none;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  gap: 4px;
+
+  @media (max-width: 900px) {
+    display: flex;
+  }
+`;
+
+const LangPillDesktop = styled.button`
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  gap: 4px;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+const LangOption = styled.span<{ $active: boolean }>`
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  color: ${({ $active }) => ($active ? "#e75113" : "#999")};
+  transition: color 0.2s;
+`;
+
+const LangSep = styled.span`
+  font-size: 12px;
+  color: #ccc;
 `;
