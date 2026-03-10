@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import StyledComponentsRegistry from "./Registry";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import "./globals.css";
 
 // Font Configurations
@@ -42,9 +43,11 @@ export default function RootLayout({
         style={{ fontFamily: "var(--font-poppins), sans-serif" }}
       >
         <StyledComponentsRegistry>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <LanguageProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </LanguageProvider>
         </StyledComponentsRegistry>
       </body>
     </html>

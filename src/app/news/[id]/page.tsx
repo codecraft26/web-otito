@@ -3,12 +3,13 @@
 import { useEffect } from "react";
 import * as React from "react";
 import NewsLayout from "../NewsLayout";
+import { useLanguage } from "../../contexts/LanguageContext";
 
-async function fetchArticleById(id: string) {
+async function fetchArticleById(id: string, lang: string = "EN") {
   try {
     const base = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.otito.in";
     const res = await fetch(
-      `${base}/api/articles/${encodeURIComponent(id)}?language=EN`,
+      `${base}/api/articles/${encodeURIComponent(id)}?language=${lang}`,
       { cache: "no-store" }
     );
     if (!res.ok) return null;
@@ -82,6 +83,7 @@ async function fetchArticleById(id: string) {
 export default function NewsPage({ params }: { params: Promise<{ id: string }> }) {
   const [article, setArticle] = React.useState<Awaited<ReturnType<typeof fetchArticleById>> | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const { language } = useLanguage();
 
   useEffect(() => {
     // Redirect logic for mobile devices
@@ -103,12 +105,12 @@ export default function NewsPage({ params }: { params: Promise<{ id: string }> }
 
   useEffect(() => {
     params.then(({ id }) => {
-      fetchArticleById(id).then((data) => {
+      fetchArticleById(id, language).then((data) => {
         setArticle(data);
         setLoading(false);
       });
     });
-  }, [params]);
+  }, [params, language]);
 
   if (loading) {
     return (
