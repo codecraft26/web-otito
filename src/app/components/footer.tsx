@@ -18,9 +18,8 @@ export default function Footer() {
       <FooterTop>
         <FooterNav>
           <StyledLink href="/">{t("footerHome")}</StyledLink>
-          <StyledLink href="/features">{t("footerAbout")}</StyledLink>
-          <StyledLink href="/#more-headlines">{t("footerNews")}</StyledLink>
-          <StyledLink href="/terms">{t("footerTerms")}</StyledLink>
+          <StyledLink href="/feature">{t("footerAbout")}</StyledLink>
+<StyledLink href="/terms">{t("footerTerms")}</StyledLink>
           <StyledLink href="/privacy">{t("footerPrivacy")}</StyledLink>
           <StyledLink href="/contactus">{t("footerContact")}</StyledLink>
           <StyledLink href="/advertise">{t("footerAdvertise")}</StyledLink>

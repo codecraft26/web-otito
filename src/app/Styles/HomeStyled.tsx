@@ -66,20 +66,14 @@ export const Title = styled.h2`
 export const Slider = styled.div`
   position: relative;
   width: 100%;
-  height: 320px;
+  aspect-ratio: 16 / 9;
+  max-height: 560px;
   overflow: hidden;
   border-radius: 16px;
 
-  @media (max-width: 1024px) {
-    height: 260px;
-  }
-
-  @media (max-width: 768px) {
-    height: 200px;
-  }
-
   @media (max-width: 480px) {
-    height: 180px;
+    aspect-ratio: 4 / 3;
+    max-height: none;
   }
 `;
 
@@ -99,6 +93,7 @@ export const ImageWrapper = styled.div`
 
 export const StyledImage = styled(Image)`
   object-fit: cover;
+  object-position: top center;
   border-radius: 16px;
 `;
 

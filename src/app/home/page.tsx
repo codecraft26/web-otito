@@ -235,9 +235,9 @@ function HomeInner() {
   // Slides depend on selected category
   const slidesParams = useMemo<Record<string, string | string[]>>(() => {
     if (apiCategoryParam) {
-      return { "category[]": [apiCategoryParam], language, page: "1", limit: "5" };
+      return { "category[]": [apiCategoryParam], language, page: "1", limit: "10" };
     }
-    return { "category[]": ["top"], language, page: "1", limit: "5" };
+    return { "category[]": ["top"], language, page: "1", limit: "10" };
   }, [apiCategoryParam, language]);
 
   const { data: topRaw, loading: slidesLoading, error: slidesError } = useApiList<ApiArticle>(
