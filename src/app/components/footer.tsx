@@ -7,9 +7,9 @@ import { useLanguage } from "../contexts/LanguageContext";
 import {
   FaInstagram,
   FaLinkedinIn,
-  FaTwitter,
   FaFacebookF,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -59,7 +59,7 @@ export default function Footer() {
             <FaLinkedinIn size={20} color="white" />
           </IconWrapper>
           <IconWrapper as="a" href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
-            <FaTwitter size={20} color="white" />
+            <FaXTwitter size={20} color="white" />
           </IconWrapper>
           <IconWrapper as="a" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
             <FaFacebookF size={20} color="white" />
