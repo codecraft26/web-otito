@@ -77,7 +77,7 @@ export const translations = {
     categories: "श्रेणियाँ",
     seeAll: "सभी देखें",
     close: "बंद करें",
-    top10Headlines: "टॉप 10 सुर्खियाँ",
+    top10Headlines: "टॉप 10 हेडलाइंस",
     moreHeadlines: "और सुर्खियाँ",
     viewMore: "और देखें",
     backToAll: "सभी समाचार पर वापस",
