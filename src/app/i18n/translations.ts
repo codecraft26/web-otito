@@ -91,7 +91,7 @@ export const translations = {
     noMoreHeadlines: "और सुर्खियाँ नहीं",
     loading: "लोड हो रहा है...",
     // NewsCard
-    fullSummary: "पूरा सारांश",
+    fullSummary: "पूरी खबर",
     source: "स्रोत:",
     // Advertise page
     advertiseTitle: "हमारे साथ विज्ञापन करें",
@@ -126,10 +126,10 @@ export const translations = {
     footerAbout: "हमारे बारे में",
     footerNews: "समाचार",
     footerTerms: "नियम और शर्तें",
-    footerPrivacy: "गोपनीयता नीति",
+    footerPrivacy: "प्राइवेसी पॉलिसी",
     footerContact: "संपर्क करें",
     footerAdvertise: "विज्ञापन दें",
-    footerTagline: "Otito आपको सभी श्रेणियों में संक्षिप्त, विश्वसनीय समाचार प्रदान करता है — दिन भर अपडेट होता रहता है।",
+    footerTagline: "ओटीटो आपको देता है सभी विश्वसनीय खबरें सिर्फ दो लाइन में",
   },
 } as const;
 
