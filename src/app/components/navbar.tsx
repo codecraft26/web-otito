@@ -4,14 +4,12 @@ import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Search, Menu, X } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function Navbar() {
-  const pathname = usePathname();
   const router = useRouter();
-  const isHomePage = pathname === "/";
   const { language, toggleLanguage, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -72,22 +70,11 @@ export default function Navbar() {
       <NavLinksWrapper $menuOpen={menuOpen}>
         <NavLinks $menuOpen={menuOpen}>
           <StyledLink href="/">{t("home")}</StyledLink>
-
-          {isHomePage ? (
-            <>
-              <StyledLink href="/feature">{t("ourFeatures")}</StyledLink>
-              <StyledLink href="/#top-trendings">{t("topTrending")}</StyledLink>
-              <StyledLink href="/#categories">{t("categories")}</StyledLink>
-              <StyledLink href="/#top-10-headlines">{t("top10Headlines")}</StyledLink>
-              <StyledLink href="/#more-headlines">{t("moreHeadlines")}</StyledLink>
-            </>
-          ) : (
-            <>
-              <StyledLink href="/feature">{t("ourFeatures")}</StyledLink>
-              <StyledLink href="/#categories">{t("categories")}</StyledLink>
-              <StyledLink href="/#top-10-headlines">{t("top10Headlines")}</StyledLink>
-            </>
-          )}
+          <StyledLink href="/feature">{t("ourFeatures")}</StyledLink>
+          <StyledLink href="/#top-trendings">{t("topTrending")}</StyledLink>
+          <StyledLink href="/#categories">{t("categories")}</StyledLink>
+          <StyledLink href="/#top-10-headlines">{t("top10Headlines")}</StyledLink>
+          <StyledLink href="/#more-headlines">{t("moreHeadlines")}</StyledLink>
 
           {/* Language toggle (desktop) */}
           <LangPillDesktop onClick={toggleLanguage}>
