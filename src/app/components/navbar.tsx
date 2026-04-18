@@ -70,11 +70,11 @@ export default function Navbar() {
       <NavLinksWrapper $menuOpen={menuOpen}>
         <NavLinks $menuOpen={menuOpen}>
           <StyledLink href="/">{t("home")}</StyledLink>
-          <StyledLink href="/feature">{t("ourFeatures")}</StyledLink>
           <StyledLink href="/#top-trendings">{t("topTrending")}</StyledLink>
-          <StyledLink href="/#categories">{t("categories")}</StyledLink>
           <StyledLink href="/#top-10-headlines">{t("top10Headlines")}</StyledLink>
           <StyledLink href="/#more-headlines">{t("moreHeadlines")}</StyledLink>
+          <StyledLink href="/#categories">{t("categories")}</StyledLink>
+          <StyledLink href="/feature">{t("ourFeatures")}</StyledLink>
 
           {/* Language toggle (desktop) */}
           <LangPillDesktop onClick={toggleLanguage}>
