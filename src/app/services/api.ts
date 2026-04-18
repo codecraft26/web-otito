@@ -48,4 +48,15 @@ export async function fetchCategories(): Promise<string[]> {
   return Array.isArray(categories) ? categories : [];
 }
 
+export async function fetchHeadlines(params?: ApiParams): Promise<unknown[]> {
+  const json = await fetchJson<unknown>("/api/headlines", params);
+  if (Array.isArray(json)) return json;
+  if (json && typeof json === "object") {
+    const obj = json as Record<string, unknown>;
+    if (Array.isArray(obj.articles)) return obj.articles as unknown[];
+    if (Array.isArray(obj.data)) return obj.data as unknown[];
+  }
+  return [];
+}
+
 
