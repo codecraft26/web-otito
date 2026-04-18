@@ -2,6 +2,7 @@
 
 import styled from "styled-components";
 import Image from "next/image";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -227,50 +228,50 @@ const StoreButtons = styled.div`
 `;
 
 export default function FeaturePage() {
+  const { t } = useLanguage();
+
   const sections = [
     {
-      title:
-        "NEVER MISS A BEAT! EXPLORE OUR NEW FEATURE <span>TOP 10 HEADLINES</span>",
-      desc: "Never miss a beat with our new Top 10 Headlines feature. Catch the most important stories of the day, all in one place. Quick, clear, and always up-to-date—stay ahead with every headline.",
+      title: t("feat1Title"),
+      desc: t("feat1Desc"),
       image: "/feature/feature1.png",
-      button: "Get the App",
+      button: t("feat1Btn"),
     },
     {
-      title: "Discover our new feature<br /><span>Notification Preference.</span>",
-      desc: "Discover news tailored to your interests with our brand-new categories. From business and technology to lifestyle and entertainment, explore stories that matter most to you. Stay informed, stay inspired, and experience the news your way.",
+      title: t("feat2Title"),
+      desc: t("feat2Desc"),
       image: "/feature/feature2.png",
-      button: "Learn More",
+      button: t("feat2Btn"),
       customWidth: "500px",
       customHeight: "500px",
     },
     {
-      title: "Explore our new feature:<br /><span>2-Line News</span>",
-      desc: "Discover news tailored to your interests with our brand-new categories. From business and technology to lifestyle and entertainment, explore stories that matter most to you. Stay informed, stay inspired, and experience the news your way.",
+      title: t("feat3Title"),
+      desc: t("feat3Desc"),
       image: "/feature/feature3.png",
-      button: "Learn More",
+      button: t("feat3Btn"),
     },
     {
-      title:
-        "Your news, simplified: Discover the <span>Latest News</span> of the day.",
-      desc: "Your news, simplified – get the latest updates at a glance. From top headlines to trending stories, everything you need is in one place. Stay connected with the world, every day, effortlessly.",
+      title: t("feat4Title"),
+      desc: t("feat4Desc"),
       image: "/feature/feature4.png",
-      button: "Get the App",
+      button: t("feat4Btn"),
     },
     {
-      title: "Headlines at Your Fingertips:<br /><span>Just Swipe</span>",
-      desc: "Your news, simplified – get the latest updates at a glance. From top headlines to trending stories, everything you need is in one place. Stay connected with the world, every day, effortlessly.",
+      title: t("feat5Title"),
+      desc: t("feat5Desc"),
       image: "/feature/feature5.png",
-      button: "Get the App",
+      button: t("feat5Btn"),
     },
     {
-      title: "<span>News in Pictures</span>,<br />Stories in Seconds",
-      desc: "Stay updated on the go. Download our mobile app for seamless access to the latest news anytime, anywhere.",
+      title: t("feat6Title"),
+      desc: t("feat6Desc"),
       image: "/feature/feature6.png",
-      button: "Download App",
+      button: t("feat6Btn"),
     },
     {
-      title: "<span>Download the App Now</span>",
-      desc: "Stay updated with the latest news anytime, anywhere.",
+      title: t("feat7Title"),
+      desc: t("feat7Desc"),
       image: "/feature/feature7.png",
       playStoreImg: "/images/playstore.png",
       appStoreImg: "/images/appstore.png",
@@ -303,7 +304,7 @@ export default function FeaturePage() {
 
               {index === sections.length - 1 ? (
                 <StoreContainer>
-                  <StoreText>Available on</StoreText>
+                  <StoreText>{t("featAvailableOn")}</StoreText>
                   <StoreButtons>
                     <div className="store-img">
                       <Image
