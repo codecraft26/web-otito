@@ -36,7 +36,7 @@ import {
 
 import NewsCard from "../components/NewsCard";
 import { useApiList } from "../hooks/useApi";
-import { fetchCategories, fetchArticles, fetchJson } from "../services/api";
+import { fetchCategories, fetchArticles, fetchHeadlines, fetchJson } from "../services/api";
 
 type ApiArticle = {
   id?: string | number;
@@ -225,13 +225,6 @@ function HomeInner() {
     return apiCategory;
   }, [apiCategory]);
 
-  const top10Params = useMemo<Record<string, string | string[]>>(() => {
-    if (apiCategoryParam) {
-      return { "category[]": [apiCategoryParam], page: "1", limit: "10", language };
-    }
-    return { page: "1", limit: "10", language } as Record<string, string>;
-  }, [apiCategoryParam, language]);
-
   // Slides depend on selected category
   const slidesParams = useMemo<Record<string, string | string[]>>(() => {
     if (apiCategoryParam) {
@@ -259,24 +252,31 @@ function HomeInner() {
     });
   }, [topRaw]);
 
-  const { data: top10Raw, loading: top10Loading, error: top10Error } = useApiList<ApiArticle>(
-    "/api/articles",
-    top10Params
-  );
   useEffect(() => {
-    setIsLoading(top10Loading);
-    setError(top10Error ?? null);
-    const mapped = top10Raw.map((a, idx) => ({
-      id: a.id ?? a._id ?? `${idx}`,
-      title: a.title ?? a.headline ?? "Untitled",
-      summary: a.twoLineDescription ?? a.summary ?? a.description ?? undefined,
-      expandedText: a.fourLineDescription ?? a.content ?? undefined,
-      image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
-      category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
-      source: deriveSource(a as LooseArticle),
-    }));
-    setHeadlines(mapped);
-  }, [top10Raw, top10Loading, top10Error]);
+    let active = true;
+    setIsLoading(true);
+    setError(null);
+    fetchHeadlines({ language, limit: "10" })
+      .then((data) => {
+        if (!active) return;
+        const mapped = (data || []).map((item, idx) => {
+          const a = item as LooseArticle;
+          return {
+            id: a.id ?? a._id ?? `${idx}`,
+            title: a.title ?? a.headline ?? "Untitled",
+            summary: a.twoLineDescription ?? a.summary ?? a.description ?? undefined,
+            expandedText: a.fourLineDescription ?? a.content ?? undefined,
+            image: a.image ?? a.imageUrl ?? a.thumbnail ?? undefined,
+            category: Array.isArray(a.category) ? a.category[0] : a.category ?? "All",
+            source: deriveSource(a),
+          };
+        });
+        setHeadlines(mapped);
+      })
+      .catch((e) => { if (active) setError(e?.message ?? "Failed to load headlines"); })
+      .finally(() => { if (active) setIsLoading(false); });
+    return () => { active = false; };
+  }, [language]);
 
   const moreParams = useMemo<Record<string, string | string[]>>(() => {
     if (apiCategoryParam) {
