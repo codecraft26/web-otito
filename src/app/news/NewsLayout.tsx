@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaFacebook, FaTwitter, FaLink } from "react-icons/fa";
 import { IoArrowBackOutline } from "react-icons/io5";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface NewsLayoutProps {
   article: {
@@ -24,6 +25,7 @@ interface NewsLayoutProps {
 
 const NewsLayout: React.FC<NewsLayoutProps> = ({ article }) => {
   const router = useRouter();
+  const { t } = useLanguage();
   const [currentSlide] = useState(0);
 
 
@@ -68,7 +70,12 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({ article }) => {
 
       {/* Footer Section */}
       <BottomRow>
-        <ThanksSection>Thanks for reading.</ThanksSection>
+        <ThanksSection>
+          <AppPromptText>{t("readOnApp")}</AppPromptText>
+          <AppButton href="https://play.google.com/store/apps/details?id=com.otito" target="_blank" rel="noopener noreferrer">
+            {t("downloadApp")}
+          </AppButton>
+        </ThanksSection>
 
         <ShareRow>
           <ShareText>Share:</ShareText>
@@ -251,19 +258,46 @@ const ThanksSection = styled.div`
   text-align: center;
   margin-top: 3rem;
   padding: 2rem 0;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #333;
   border-top: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 
   @media (max-width: 768px) {
-    font-size: 1rem;
     margin-top: 2rem;
     padding: 1.5rem 0;
+  }
+`;
+
+const AppPromptText = styled.p`
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+
+  @media (max-width: 480px) {
+    font-size: 0.95rem;
+  }
+`;
+
+const AppButton = styled.a`
+  display: inline-block;
+  background-color: #e54b1f;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background-color: #c73d18;
   }
 
   @media (max-width: 480px) {
     font-size: 0.9rem;
+    padding: 10px 22px;
   }
 `;
 
