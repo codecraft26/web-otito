@@ -71,7 +71,6 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({ article }) => {
       {/* Footer Section */}
       <BottomRow>
         <ThanksSection>
-          <AppPromptText>{t("readOnApp")}</AppPromptText>
           <AppButton href="https://play.google.com/store/apps/details?id=com.otito" target="_blank" rel="noopener noreferrer">
             {t("downloadApp")}
           </AppButton>
@@ -270,15 +269,6 @@ const ThanksSection = styled.div`
   }
 `;
 
-const AppPromptText = styled.p`
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #333;
-
-  @media (max-width: 480px) {
-    font-size: 0.95rem;
-  }
-`;
 
 const AppButton = styled.a`
   display: inline-block;
