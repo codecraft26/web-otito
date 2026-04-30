@@ -89,7 +89,7 @@ export const translations = {
     featAvailableOn: "Available on",
     // News article page
     readOnApp: "Read the full story on the app",
-    downloadApp: "📲 Download App",
+    downloadApp: "Download App",
   },
   HI: {
     // Navbar
@@ -179,7 +179,7 @@ export const translations = {
     featAvailableOn: "उपलब्ध है",
     // News article page
     readOnApp: "पूरी खबर ऐप पर पढ़ें",
-    downloadApp: "📲 ऐप डाउनलोड करें",
+    downloadApp: "ऐप डाउनलोड करें",
   },
 } as const;
 
