@@ -241,7 +241,6 @@ export default function FeaturePage() {
       title: t("feat2Title"),
       desc: t("feat2Desc"),
       image: "/feature/feature2.png",
-      button: t("feat2Btn"),
       customWidth: "500px",
       customHeight: "500px",
     },
@@ -249,7 +248,6 @@ export default function FeaturePage() {
       title: t("feat3Title"),
       desc: t("feat3Desc"),
       image: "/feature/feature3.png",
-      button: t("feat3Btn"),
     },
     {
       title: t("feat4Title"),
@@ -306,27 +304,29 @@ export default function FeaturePage() {
                 <StoreContainer>
                   <StoreText>{t("featAvailableOn")}</StoreText>
                   <StoreButtons>
-                    <div className="store-img">
+                    <a href="https://play.google.com/store/apps/details?id=com.otito" target="_blank" rel="noopener noreferrer" className="store-img">
                       <Image
                         src={section.playStoreImg || ""}
                         alt="Get it on Play Store"
                         fill
                         style={{ objectFit: "contain" }}
                       />
-                    </div>
-                    <div className="store-img">
+                    </a>
+                    <a href="https://apps.apple.com/in/app/otito/id6754835189" target="_blank" rel="noopener noreferrer" className="store-img">
                       <Image
                         src={section.appStoreImg || ""}
                         alt="Download on App Store"
                         fill
                         style={{ objectFit: "contain" }}
                       />
-                    </div>
+                    </a>
                   </StoreButtons>
                 </StoreContainer>
-              ) : (
-                <Button>{section.button}</Button>
-              )}
+              ) : section.button ? (
+                <Button as="a" href="https://play.google.com/store/apps/details?id=com.otito" target="_blank" rel="noopener noreferrer">
+                  {section.button}
+                </Button>
+              ) : null}
             </Content>
           </InnerContainer>
         </Section>
