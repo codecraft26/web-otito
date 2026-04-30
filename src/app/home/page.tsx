@@ -451,7 +451,6 @@ function HomeInner() {
       <Container>
         {/* ---- TOP TRENDINGS ---- */}
         <Section id="top-trendings">
-          <Title>{t("topTrending")}</Title>
           <Slider>
             {slidesLoading ? (
               <p style={{ textAlign: "center", color: "#999" }}>{t("loading")}</p>
@@ -491,10 +490,6 @@ function HomeInner() {
         <Section id="categories">
           <CategoriesWrapper>
             <CategoriesHeader>
-              <Title>{t("categories")}</Title>
-              <SeeAllButton onClick={() => setShowAllCategories(!showAllCategories)}>
-                {showAllCategories ? t("close") : t("seeAll")}
-              </SeeAllButton>
             </CategoriesHeader>
 
             {!showAllCategories ? (
@@ -573,7 +568,10 @@ function HomeInner() {
         {/* ---- MORE HEADLINES ---- */}
         <Section id="more-headlines">
           <HeadlinesSection>
-            <Title>{t("moreHeadlines")}</Title>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+              <Title>{t("moreHeadlines")}</Title>
+              <span style={{ fontSize: "16px", fontWeight: 600, color: "#c75b27" }}>{language === "HI" ? "कैटेगरी" : "CATEGORIES"}</span>
+            </div>
 
             <HeadlinesGrid>
               {isLoadingMore ? (

@@ -96,7 +96,7 @@ export const translations = {
     // Home sections
     topTrending: "टॉप ट्रेंडिंग",
     topTrendingBadge: "टॉप ट्रेंडिंग",
-    categories: "श्रेणियाँ",
+    categories: "कैटेगरी",
     seeAll: "सभी देखें",
     close: "बंद करें",
     top10Headlines: "टॉप 10 हेडलाइंस",
