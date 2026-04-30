@@ -45,20 +45,13 @@ export default function Footer() {
         </FooterAddress>
 
         <SocialIcons>
-          <IconWrapper
-            as="a"
-            href="https://www.instagram.com/otitonewsofficial"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Follow us on Instagram"
-            title="@otitonewsofficial on Instagram"
-          >
+          <IconWrapper as="a" href="https://www.instagram.com/otitonewsofficial?igsh=Zm1qNnJxcHpsamJ4" target="_blank" rel="noopener noreferrer">
             <FaInstagram size={22} color="white" />
           </IconWrapper>
-          <IconWrapper as="a" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+          <IconWrapper as="a" href="https://www.linkedin.com/company/otito-news/" target="_blank" rel="noopener noreferrer">
             <FaLinkedinIn size={20} color="white" />
           </IconWrapper>
-          <IconWrapper as="a" href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
+          <IconWrapper as="a" href="https://x.com/otitonews" target="_blank" rel="noopener noreferrer">
             <FaXTwitter size={20} color="white" />
           </IconWrapper>
           <IconWrapper as="a" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
