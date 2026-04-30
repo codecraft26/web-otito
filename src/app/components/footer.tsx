@@ -45,18 +45,24 @@ export default function Footer() {
         </FooterAddress>
 
         <SocialIcons>
-          <IconWrapper as="a" href="https://www.instagram.com/otitonewsofficial?igsh=Zm1qNnJxcHpsamJ4" target="_blank" rel="noopener noreferrer">
+          <BrandIcon as="a" href="https://www.instagram.com/otitonewsofficial?igsh=Zm1qNnJxcHpsamJ4" target="_blank" rel="noopener noreferrer" $bg="radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)">
             <FaInstagram size={22} color="white" />
-          </IconWrapper>
-          <IconWrapper as="a" href="https://www.linkedin.com/company/otito-news/" target="_blank" rel="noopener noreferrer">
+          </BrandIcon>
+          <BrandIcon as="a" href="https://www.linkedin.com/company/otito-news/" target="_blank" rel="noopener noreferrer" $bg="#0077B5">
             <FaLinkedinIn size={20} color="white" />
-          </IconWrapper>
-          <IconWrapper as="a" href="https://x.com/otitonews" target="_blank" rel="noopener noreferrer">
+          </BrandIcon>
+          <BrandIcon as="a" href="https://x.com/otitonews" target="_blank" rel="noopener noreferrer" $bg="#000000">
             <FaXTwitter size={20} color="white" />
-          </IconWrapper>
-          <IconWrapper as="a" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+          </BrandIcon>
+          <BrandIcon as="a" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" $bg="#1877F2">
             <FaFacebookF size={20} color="white" />
-          </IconWrapper>
+          </BrandIcon>
+          <StoreBadge href="https://play.google.com/store/apps/details?id=com.otito" target="_blank" rel="noopener noreferrer">
+            <Image src="/images/playstore.png" alt="Get it on Play Store" width={120} height={40} style={{ objectFit: "contain" }} />
+          </StoreBadge>
+          <StoreBadge href="https://apps.apple.com/in/app/otito/id6754835189" target="_blank" rel="noopener noreferrer">
+            <Image src="/images/appstore.png" alt="Download on App Store" width={120} height={40} style={{ objectFit: "contain" }} />
+          </StoreBadge>
         </SocialIcons>
       </FooterTop>
 
@@ -147,16 +153,16 @@ const StyledLink = styled(Link)`
 `;
 
 const LogoWrapper = styled.div`
-  margin: 1.8rem 0 1.3rem;
+  margin: 0.4rem 0 0.4rem;
   display: flex;
   justify-content: center;
 
   @media (max-width: 768px) {
-    margin: 1.5rem 0 1rem;
+    margin: 0.3rem 0 0.3rem;
   }
 
   @media (max-width: 480px) {
-    margin: 1rem 0 0.8rem;
+    margin: 0.2rem 0 0.2rem;
   }
 `;
 
@@ -219,19 +225,20 @@ const SocialIcons = styled.div`
   }
 `;
 
-const IconWrapper = styled.div`
+const BrandIcon = styled.div<{ $bg: string }>`
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.15);
+  background: ${({ $bg }) => $bg};
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  text-decoration: none;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.28);
-    transform: translateY(-2px) scale(1.05);
+    transform: translateY(-2px) scale(1.08);
+    opacity: 0.9;
   }
 
   @media (max-width: 768px) {
@@ -267,5 +274,15 @@ const FooterBottom = styled.div`
   @media (max-width: 480px) {
     font-size: 0.85rem;
     padding: 0.8rem 0;
+  }
+`;
+
+const StoreBadge = styled.a`
+  display: inline-flex;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px) scale(1.05);
+    opacity: 0.9;
   }
 `;
