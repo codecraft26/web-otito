@@ -87,6 +87,9 @@ export const translations = {
     feat7Title: "<span>Download the App Now</span>",
     feat7Desc: "Stay updated with the latest news anytime, anywhere.",
     featAvailableOn: "Available on",
+    // News article page
+    readOnApp: "Read the full story on the app",
+    downloadApp: "📲 Download App",
   },
   HI: {
     // Navbar
@@ -174,6 +177,9 @@ export const translations = {
     feat7Title: "<span>अभी ऐप डाउनलोड करें</span>",
     feat7Desc: "कभी भी, कहीं भी ताज़ा खबरों से अपडेट रहें।",
     featAvailableOn: "उपलब्ध है",
+    // News article page
+    readOnApp: "पूरी खबर ऐप पर पढ़ें",
+    downloadApp: "📲 ऐप डाउनलोड करें",
   },
 } as const;
 
