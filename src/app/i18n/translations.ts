@@ -201,11 +201,11 @@ export const categoryNames: Record<Lang, Record<string, string>> = {
     headline: "Headline",
   },
   HI: {
-    business: "बिज़नेस", crime: "क्राइम", domestic: "भारत",
+    business: "बिज़नेस", crime: "क्राइम", domestic: "होम",
     education: "शिक्षा", entertainment: "मनोरंजन", environment: "पर्यावरण",
     food: "खाना", health: "स्वास्थ्य", lifestyle: "लाइफ", other: "अन्य",
     politics: "राजनीति", science: "विज्ञान", sports: "खेल",
-    technology: "टेक्नोलॉजी", top: "टॉप", tourism: "पर्यटन", world: "विश्व",
+    technology: "टेक्नोलॉजी", top: "टॉप", tourism: "पर्यटन", world: "दुनिया",
     // slugs returned by live API
     india: "भारत", India: "भारत",
     fun: "मनोरंजन",
