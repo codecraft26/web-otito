@@ -106,7 +106,7 @@ export const translations = {
     moreHeadlines: "और सुर्खियाँ",
     viewMore: "और देखें",
     backToAll: "सभी समाचार पर वापस",
-    newsInCategory: "श्रेणी में समाचार:",
+    newsInCategory: "केटेगरी:",
     searchResultsFor: "खोज परिणाम:",
     clearSearch: "खोज साफ़ करें",
     searching: "खोज रहे हैं...",
@@ -201,11 +201,11 @@ export const categoryNames: Record<Lang, Record<string, string>> = {
     headline: "Headline",
   },
   HI: {
-    business: "व्यापार", crime: "अपराध", domestic: "घरेलू",
+    business: "बिज़नेस", crime: "क्राइम", domestic: "भारत",
     education: "शिक्षा", entertainment: "मनोरंजन", environment: "पर्यावरण",
-    food: "खाना", health: "स्वास्थ्य", lifestyle: "जीवनशैली", other: "अन्य",
+    food: "खाना", health: "स्वास्थ्य", lifestyle: "लाइफ", other: "अन्य",
     politics: "राजनीति", science: "विज्ञान", sports: "खेल",
-    technology: "तकनीक", top: "टॉप", tourism: "पर्यटन", world: "विश्व",
+    technology: "टेक्नोलॉजी", top: "टॉप", tourism: "पर्यटन", world: "विश्व",
     // slugs returned by live API
     india: "भारत", India: "भारत",
     fun: "मनोरंजन",
