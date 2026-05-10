@@ -8,6 +8,7 @@ import {
   FaInstagram,
   FaLinkedinIn,
   FaFacebookF,
+  FaYoutube,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
@@ -45,17 +46,20 @@ export default function Footer() {
         </FooterAddress>
 
         <SocialIcons>
-          <BrandIcon as="a" href="https://www.instagram.com/otitonewsofficial?igsh=Zm1qNnJxcHpsamJ4" target="_blank" rel="noopener noreferrer" $bg="radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)">
+          <BrandIcon as="a" href="https://www.instagram.com/otitonewsofficial?igsh=enh1MHcybmlhaTUy" target="_blank" rel="noopener noreferrer" $bg="radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)">
             <FaInstagram size={22} color="white" />
           </BrandIcon>
           <BrandIcon as="a" href="https://www.linkedin.com/company/otito-news/" target="_blank" rel="noopener noreferrer" $bg="#0077B5">
             <FaLinkedinIn size={20} color="white" />
           </BrandIcon>
-          <BrandIcon as="a" href="https://x.com/otitonews" target="_blank" rel="noopener noreferrer" $bg="#000000">
+          <BrandIcon as="a" href="https://x.com/Otito_Hindi" target="_blank" rel="noopener noreferrer" $bg="#000000">
             <FaXTwitter size={20} color="white" />
           </BrandIcon>
-          <BrandIcon as="a" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" $bg="#1877F2">
+          <BrandIcon as="a" href="https://www.facebook.com/share/1BV43fSrnJ/" target="_blank" rel="noopener noreferrer" $bg="#1877F2">
             <FaFacebookF size={20} color="white" />
+          </BrandIcon>
+          <BrandIcon as="a" href="https://youtube.com/@otitonews?si=B1aRhE0MUXBBnTXG" target="_blank" rel="noopener noreferrer" $bg="#FF0000">
+            <FaYoutube size={22} color="white" />
           </BrandIcon>
           <StoreBadge href="https://play.google.com/store/apps/details?id=com.otito" target="_blank" rel="noopener noreferrer">
             <Image src="/images/playstore.png" alt="Get it on Play Store" width={120} height={40} style={{ objectFit: "contain" }} />
