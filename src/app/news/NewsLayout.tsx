@@ -202,22 +202,6 @@ const ArticleBody = styled.div`
   }
 `;
 
-const Section = styled.div``;
-
-const Heading = styled.h3`
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-  color: #000;
-
-  @media (max-width: 768px) {
-    font-size: 1.1rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1rem;
-  }
-`;
 
 const Paragraph = styled.p`
   color: #444;
@@ -290,6 +274,27 @@ const AppButton = styled.a`
     padding: 10px 22px;
   }
 `;
+
+
+const Section = styled.div``;
+
+const Heading = styled.h3`
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #000;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+  }
+`;
+
+
+
 
 const MetaRow = styled.div`
   display: flex;
