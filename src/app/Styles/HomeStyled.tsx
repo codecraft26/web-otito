@@ -82,6 +82,7 @@ export const Slide = styled.div<{ $active: boolean }>`
   width: 100%;
   height: 100%;
   opacity: ${({ $active }) => ($active ? 1 : 0)};
+  pointer-events: ${({ $active }) => ($active ? "auto" : "none")};
   transition: opacity 0.6s ease;
 `;
 
@@ -144,6 +145,37 @@ export const Caption = styled.p`
   }
 `;
 
+export const SliderArrow = styled.button<{ $dir: "left" | "right" }>`
+  position: absolute;
+  top: 50%;
+  ${({ $dir }) => ($dir === "left" ? "left: 12px;" : "right: 12px;")}
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  @media (max-width: 480px) {
+    width: 34px;
+    height: 34px;
+    font-size: 1.2rem;
+  }
+`;
+
 export const Dots = styled.div`
   display: flex;
   justify-content: center;
@@ -191,11 +223,47 @@ export const SeeAllButton = styled.button`
   }
 `;
 
+export const CategoriesScrollWrapper = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const ScrollArrow = styled.button<{ $dir: "left" | "right" }>`
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #e75113;
+  color: #fff;
+  font-size: 1.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: 1;
+
+  &:hover {
+    background: #c73d18;
+    transform: scale(1.08);
+  }
+
+  @media (max-width: 480px) {
+    width: 38px;
+    height: 38px;
+    font-size: 1.3rem;
+  }
+`;
+
 export const CategoriesScroll = styled.div`
   display: flex;
   overflow-x: auto;
   gap: 12px;
   padding: 8px;
+  flex: 1;
 
   &::-webkit-scrollbar {
     display: none;

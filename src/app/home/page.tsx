@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useMemo, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useLanguage } from "../contexts/LanguageContext";
 import { categoryNames } from "../i18n/translations";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import {
   Wrapper,
   Container,
   Section,
   Title,
   Slider,
+  SliderArrow,
   Slide,
   ImageWrapper,
   StyledImage,
@@ -22,11 +24,12 @@ import {
   Dot,
   CategoriesWrapper,
   CategoriesHeader,
+  CategoriesScrollWrapper,
   CategoriesScroll,
+  ScrollArrow,
   CategoryButton,
   CategoryIcon,
   CategoryText,
-  SeeAllButton,
   CategoriesGrid,
   HeadlinesSection,
   HeadlinesGrid,
@@ -206,10 +209,24 @@ function HomeInner() {
   const [categoryError, setCategoryError] = useState<string|null>(null);
 
   // ----- States -----
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scroll = (dir: "left" | "right") => {
+    if (scrollRef.current) scrollRef.current.scrollBy({ left: dir === "left" ? -300 : 300, behavior: "smooth" });
+  };
+
   const [current, setCurrent] = useState(0);
-  const [showAllCategories, setShowAllCategories] = useState(false);
   const [showAllHeadlines, setShowAllHeadlines] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const selectedCategory = searchParams.get("category") ?? "All";
+  const setSelectedCategory = (cat: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (cat === "All") {
+      params.delete("category");
+    } else {
+      params.set("category", cat);
+    }
+    const newUrl = params.toString() ? `/?${params.toString()}` : "/";
+    router.push(newUrl);
+  };
 
   const apiCategory = useMemo(() => {
     const name = selectedCategory;
@@ -422,7 +439,7 @@ function HomeInner() {
         <Container>
           <Section>
             <Title>
-              {t("newsInCategory")} {getCatName(selectedCategory)}
+              {getCatName(selectedCategory)}
             </Title>
             <ButtonWrapper>
               <ViewMoreButton onClick={() => setSelectedCategory("All")}>{t("backToAll")}</ViewMoreButton>
@@ -457,21 +474,25 @@ function HomeInner() {
             ) : slidesError ? (
               <p style={{ textAlign: "center", color: "#c00" }}>{slidesError}</p>
             ) : filteredSlides.length > 0 ? (
-              filteredSlides.map((slide, index) => (
-                <Slide key={slide.id} $active={index === current}>
-                  <ImageWrapper
-                    onClick={() => router.push(`/news/${slide.id}`)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <StyledImage src={slide.image} alt={slide.caption} fill priority />
-                    <Overlay />
-                    <CaptionWrapper>
-                      <SlideBadge>{t("topTrendingBadge")}</SlideBadge>
-                      <Caption>{slide.caption}</Caption>
-                    </CaptionWrapper>
-                  </ImageWrapper>
-                </Slide>
-              ))
+              <>
+                {filteredSlides.map((slide, index) => (
+                  <Slide key={slide.id} $active={index === current}>
+                    <ImageWrapper
+                      onClick={() => router.push(`/news/${slide.id}`)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <StyledImage src={slide.image} alt={slide.caption} fill priority />
+                      <Overlay />
+                      <CaptionWrapper>
+                        <SlideBadge>{t("topTrendingBadge")}</SlideBadge>
+                        <Caption>{slide.caption}</Caption>
+                      </CaptionWrapper>
+                    </ImageWrapper>
+                  </Slide>
+                ))}
+                <SliderArrow type="button" $dir="left" onClick={() => setCurrent((prev) => (prev - 1 + filteredSlides.length) % filteredSlides.length)}><MdChevronLeft size={28} /></SliderArrow>
+                <SliderArrow type="button" $dir="right" onClick={() => setCurrent((prev) => (prev + 1) % filteredSlides.length)}><MdChevronRight size={28} /></SliderArrow>
+              </>
             ) : (
               <p style={{ textAlign: "center", color: "#999" }}>
                 {t("noTrending")} {selectedCategory}.
@@ -481,7 +502,7 @@ function HomeInner() {
 
           <Dots>
             {filteredSlides.map((_, index) => (
-              <Dot key={index} $active={index === current} />
+              <Dot key={index} $active={index === current} onClick={() => setCurrent(index)} style={{ cursor: "pointer" }} />
             ))}
           </Dots>
         </Section>
@@ -492,8 +513,9 @@ function HomeInner() {
             <CategoriesHeader>
             </CategoriesHeader>
 
-            {!showAllCategories ? (
-              <CategoriesScroll>
+            <CategoriesScrollWrapper>
+              <ScrollArrow type="button" $dir="left" onClick={() => scroll("left")}><MdChevronLeft size={28} /></ScrollArrow>
+              <CategoriesScroll ref={scrollRef}>
                 {categories.map((cat) => (
                   <CategoryButton
                     key={cat.slug}
@@ -512,27 +534,8 @@ function HomeInner() {
                   </CategoryButton>
                 ))}
               </CategoriesScroll>
-            ) : (
-              <CategoriesGrid>
-                {categories.map((cat) => (
-                  <CategoryButton
-                    key={cat.slug}
-                    onClick={() => setSelectedCategory(cat.slug)}
-                    style={{
-                      border:
-                        selectedCategory === cat.slug
-                          ? "2px solid #c75b27"
-                          : "2px solid transparent",
-                    }}
-                  >
-                    <CategoryIcon>
-                      <Image src={cat.icon} alt={getCatName(cat.slug)} width={60} height={60} />
-                    </CategoryIcon>
-                    <CategoryText>{getCatName(cat.slug)}</CategoryText>
-                  </CategoryButton>
-                ))}
-              </CategoriesGrid>
-            )}
+              <ScrollArrow type="button" $dir="right" onClick={() => scroll("right")}><MdChevronRight size={28} /></ScrollArrow>
+            </CategoriesScrollWrapper>
           </CategoriesWrapper>
         </Section>
 
