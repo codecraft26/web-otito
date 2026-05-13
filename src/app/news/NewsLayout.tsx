@@ -62,7 +62,7 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({ article }) => {
       <ArticleBody>
         {article.content.map((section, i) => (
           <Section key={i}>
-            <Heading>{section.heading}</Heading>
+            {section.heading ? <Heading>{section.heading}</Heading> : null}
             <Paragraph>{section.text}</Paragraph>
           </Section>
         ))}
