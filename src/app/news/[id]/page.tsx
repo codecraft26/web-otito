@@ -54,13 +54,9 @@ async function fetchArticleById(id: string, lang: string = "EN") {
         .split(/\n\n+/)
         .map((b: string) => b.trim())
         .filter(Boolean);
-      blocks.forEach((block: string, idx: number) => {
-        contentArray.push({ heading: `Section ${idx + 1}`, text: block });
+      blocks.forEach((block: string) => {
+        contentArray.push({ heading: "", text: block });
       });
-    }
-
-    if (Array.isArray(data.tags) && data.tags.length > 0) {
-      contentArray.push({ heading: "Tags", text: data.tags.join(", ") });
     }
 
     return {
