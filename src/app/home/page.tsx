@@ -30,7 +30,6 @@ import {
   CategoryButton,
   CategoryIcon,
   CategoryText,
-  CategoriesGrid,
   HeadlinesSection,
   HeadlinesGrid,
   ButtonWrapper,
@@ -39,7 +38,7 @@ import {
 
 import NewsCard from "../components/NewsCard";
 import { useApiList } from "../hooks/useApi";
-import { fetchCategories, fetchArticles, fetchHeadlines, fetchJson } from "../services/api";
+import { fetchCategories, fetchArticles, fetchHeadlines, fetchTrending, fetchJson } from "../services/api";
 
 type ApiArticle = {
   id?: string | number;
@@ -242,18 +241,30 @@ function HomeInner() {
     return apiCategory;
   }, [apiCategory]);
 
-  // Slides depend on selected category
-  const slidesParams = useMemo<Record<string, string | string[]>>(() => {
-    if (apiCategoryParam) {
-      return { "category[]": [apiCategoryParam], language, page: "1", limit: "10" };
-    }
-    return { "category[]": ["top"], language, page: "1", limit: "10" };
-  }, [apiCategoryParam, language]);
+  // Slides from breaking-or-trending endpoint
+  const [topRaw, setTopRaw] = useState<ApiArticle[]>([]);
+  const [slidesLoading, setSlidesLoading] = useState(false);
+  const [slidesError, setSlidesError] = useState<string | null>(null);
 
-  const { data: topRaw, loading: slidesLoading, error: slidesError } = useApiList<ApiArticle>(
-    "/api/articles",
-    slidesParams
-  );
+  useEffect(() => {
+    let active = true;
+    setSlidesLoading(true);
+    setSlidesError(null);
+    fetchTrending({ language })
+      .then(async (data) => {
+        if (!active) return;
+        if (data && data.length > 0) {
+          setTopRaw(data.map((item) => item as ApiArticle));
+        } else {
+          // fallback to top articles if trending is empty
+          const fallback = await fetchArticles({ "category[]": ["top"], language, page: "1", limit: "10" });
+          if (active) setTopRaw(fallback.map((item) => item as ApiArticle));
+        }
+      })
+      .catch((e) => { if (active) setSlidesError(e?.message ?? "Failed to load trending"); })
+      .finally(() => { if (active) setSlidesLoading(false); });
+    return () => { active = false; };
+  }, [language]);
 
   const slides: Slide[] = useMemo(() => {
     return topRaw.map((a, idx) => {
