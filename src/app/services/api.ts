@@ -48,6 +48,22 @@ export async function fetchCategories(): Promise<string[]> {
   return Array.isArray(categories) ? categories : [];
 }
 
+export async function fetchTrending(params?: ApiParams): Promise<unknown[]> {
+  const json = await fetchJson<unknown>("/api/breaking-or-trending", params);
+  if (Array.isArray(json)) return json;
+  if (json && typeof json === "object") {
+    const obj = json as Record<string, unknown>;
+    // check all common wrapper keys
+    for (const key of ["articles", "data", "items", "news", "trending", "results", "breakingNews", "breaking"]) {
+      if (Array.isArray(obj[key])) return obj[key] as unknown[];
+    }
+    // fallback: find first array value in response
+    const firstArray = Object.values(obj).find((v) => Array.isArray(v));
+    if (firstArray) return firstArray as unknown[];
+  }
+  return [];
+}
+
 export async function fetchHeadlines(params?: ApiParams): Promise<unknown[]> {
   const json = await fetchJson<unknown>("/api/headlines", params);
   if (Array.isArray(json)) return json;
