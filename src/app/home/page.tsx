@@ -250,7 +250,7 @@ function HomeInner() {
     let active = true;
     setSlidesLoading(true);
     setSlidesError(null);
-    fetchTrending({ language })
+    fetchTrending(language)
       .then(async (data) => {
         if (!active) return;
         if (data && data.length > 0) {

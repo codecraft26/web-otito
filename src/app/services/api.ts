@@ -48,19 +48,72 @@ export async function fetchCategories(): Promise<string[]> {
   return Array.isArray(categories) ? categories : [];
 }
 
-export async function fetchTrending(params?: ApiParams): Promise<unknown[]> {
-  const json = await fetchJson<unknown>("/api/breaking-or-trending", params);
-  if (Array.isArray(json)) return json;
-  if (json && typeof json === "object") {
-    const obj = json as Record<string, unknown>;
-    // check all common wrapper keys
-    for (const key of ["articles", "data", "items", "news", "trending", "results", "breakingNews", "breaking"]) {
-      if (Array.isArray(obj[key])) return obj[key] as unknown[];
-    }
-    // fallback: find first array value in response
-    const firstArray = Object.values(obj).find((v) => Array.isArray(v));
-    if (firstArray) return firstArray as unknown[];
+type BreakingNewsPayload = {
+  _id?: string;
+  headline1?: string;
+  headline2?: string;
+  headline3?: string;
+  headline4?: string;
+  headline5?: string;
+  videoUrl?: string;
+  photoUrls?: string[];
+  photos?: string[];
+};
+
+type BreakingOrTrendingPayload = {
+  mode?: "breaking" | "trending";
+  breakingNews?: BreakingNewsPayload | null;
+  trendingArticles?: unknown[];
+};
+
+type BreakingOrTrendingResponse = {
+  success?: boolean;
+  data?: BreakingOrTrendingPayload;
+};
+
+function breakingNewsToArticles(breaking: BreakingNewsPayload): unknown[] {
+  const image =
+    breaking.photoUrls?.[0] ??
+    (Array.isArray(breaking.photos) ? breaking.photos[0] : undefined) ??
+    "/images/demo1.png";
+  const headlines = [
+    breaking.headline1,
+    breaking.headline2,
+    breaking.headline3,
+    breaking.headline4,
+    breaking.headline5,
+  ].filter((h): h is string => Boolean(h?.trim()));
+
+  if (headlines.length === 0) {
+    return [{ _id: breaking._id, title: "Breaking News", image, category: "Breaking" }];
   }
+
+  return headlines.map((title, idx) => ({
+    _id: `${breaking._id ?? "breaking"}-${idx}`,
+    title,
+    image,
+    category: "Breaking",
+  }));
+}
+
+/** GET /api/breaking-or-trending?language=EN|HI */
+export async function fetchTrending(language: "EN" | "HI", limit = 10): Promise<unknown[]> {
+  const json = await fetchJson<BreakingOrTrendingResponse>("/api/breaking-or-trending", {
+    language,
+    limit: String(limit),
+  });
+
+  const payload = json?.data;
+  if (!payload || typeof payload !== "object") return [];
+
+  if (payload.mode === "breaking" && payload.breakingNews) {
+    return breakingNewsToArticles(payload.breakingNews);
+  }
+
+  if (Array.isArray(payload.trendingArticles)) {
+    return payload.trendingArticles;
+  }
+
   return [];
 }
 
