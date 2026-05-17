@@ -251,15 +251,9 @@ function HomeInner() {
     setSlidesLoading(true);
     setSlidesError(null);
     fetchTrending({ language })
-      .then(async (data) => {
+      .then((data) => {
         if (!active) return;
-        if (data && data.length > 0) {
-          setTopRaw(data.map((item) => item as ApiArticle));
-        } else {
-          // fallback to top articles if trending is empty
-          const fallback = await fetchArticles({ "category[]": ["top"], language, page: "1", limit: "10" });
-          if (active) setTopRaw(fallback.map((item) => item as ApiArticle));
-        }
+        setTopRaw((data || []).map((item) => item as ApiArticle));
       })
       .catch((e) => { if (active) setSlidesError(e?.message ?? "Failed to load trending"); })
       .finally(() => { if (active) setSlidesLoading(false); });
