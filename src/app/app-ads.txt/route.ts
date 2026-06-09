@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const appAdsContent = `google.com, pub-1691544452951893, DIRECT, f08c47fec0942fa0`;
+  const appAdsContent = `google.com, pub-1691544452951893, DIRECT, f08c47fec0942fa0
+facebook.com, 1509991147347538, DIRECT, c3e20eee3f780d68`;
 
   return new NextResponse(appAdsContent, {
     status: 200,
